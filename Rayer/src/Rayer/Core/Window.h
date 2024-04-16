@@ -1,6 +1,9 @@
 #pragma once
 #include <rpch.h>
 
+#include <Rayer/Event/Event.h> //For the callback function
+
+
 
 namespace Rayer {
 
@@ -27,6 +30,8 @@ namespace Rayer {
 
 	public:
 
+		using EventCallbackFn = std::function<void(Event&)>;
+
 		//Window initialization method
 		virtual void Init(const WindowProperties& _props) = 0;
 
@@ -35,6 +40,8 @@ namespace Rayer {
 		virtual void ClearFrame() = 0;
 		virtual void SwapBuffers() = 0;
 		virtual void PoolEvents() = 0;
+		
+		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 
 		//Window data retrival methods
 		virtual unsigned int GetWindowHeight() const = 0;

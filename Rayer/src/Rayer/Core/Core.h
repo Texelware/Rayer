@@ -1,5 +1,7 @@
 #pragma once
 
+#define BIT(x) (1 << x)
+
 //////////////////////////////////////
 ///////////PLATFORMS/////////////////
 ////Windows => GLFWwindow(Using glfw)

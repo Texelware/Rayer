@@ -6,6 +6,9 @@
 #include <glfw3.h>
 #include <Rayer/Core/Window.h>
 
+//Actual Event includes
+#include <Rayer/Event/ApplicationEvent.h>
+
 
 namespace Rayer {
 
@@ -28,6 +31,8 @@ namespace Rayer {
 		virtual unsigned int GetWindowHeight() const override;
 		virtual void* GetNativeWindow() override;
 		virtual void SetFullScreenMode(bool fullscrenn) override;
+
+		virtual void SetEventCallback(const EventCallbackFn& callback) override;
 	
 
 	private:
@@ -42,6 +47,8 @@ namespace Rayer {
 			unsigned int w_Width;
 			unsigned int w_Height;
 			bool w_VSync;
+
+			EventCallbackFn m_Callback; //Will get called when window recieves events(eg. Mouse Events, Key Events, etc)
 		};
 		
 		//Main window data entity

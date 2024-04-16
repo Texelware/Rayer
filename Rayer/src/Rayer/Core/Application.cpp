@@ -3,6 +3,8 @@
 
 namespace Rayer {
 
+	#define BIND_EVENT_FN(x) std::bind(&Application::x , this , std::placeholders::_1)
+
 	Application::Application() {
 
 		m_Window = IWindow::Create();
@@ -13,6 +15,8 @@ namespace Rayer {
 			std::terminate();
 		}
 
+		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+	
 	}
 
 	void Application::ApplicationLoop() {
@@ -27,6 +31,22 @@ namespace Rayer {
 
 		}
 
+	}
+
+	void Application::OnEvent(Event& e) {
+
+		EventDispatcher dispatcher(e);
+
+		dispatcher.Dispatch<WindowClosedEvent>(BIND_EVENT_FN(OnWindowClose));
+		
+
+	}
+
+	bool Application::OnWindowClose(WindowClosedEvent& e) {
+
+		m_Running = false;
+
+		return true;
 	}
 
 }

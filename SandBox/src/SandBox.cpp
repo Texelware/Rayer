@@ -1,5 +1,5 @@
-#include "rpch.h"
-#include "Rayer.h"
+
+#include "Rayer.h" 
 
 class SandBox : public Rayer::Application {
 

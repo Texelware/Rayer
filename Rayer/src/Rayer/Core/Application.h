@@ -8,6 +8,7 @@
 namespace Rayer {
 	
 
+
 	//Main Application class
 	class Application {
 
@@ -16,6 +17,13 @@ namespace Rayer {
 		Application();
 
 		void ApplicationLoop();
+
+		//Event handler methods
+		void OnEvent(Event& e);
+
+		//Window related callback methods
+		bool OnWindowClose(WindowClosedEvent& e);
+		
 
 
 	private:

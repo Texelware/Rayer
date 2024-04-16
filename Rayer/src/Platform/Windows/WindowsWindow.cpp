@@ -61,6 +61,19 @@ namespace Rayer {
 		//Setting VSync
 		SetVSync(m_WindowData.w_VSync);
 
+		//------------------------Callbacks------------------------
+
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowClosedEvent event;
+			data.m_Callback(event);
+			});
+
+
+
+
+		//------------------------Callbacks------------------------
+
 	}
 
 
@@ -129,6 +142,13 @@ namespace Rayer {
 
 			glfwMaximizeWindow(m_Window);
 		}
+
+	}
+
+
+	void WindowsWindow::SetEventCallback(const EventCallbackFn& callback) {
+
+		m_WindowData.m_Callback = callback;
 
 	}
 	
