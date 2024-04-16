@@ -1,1 +1,2 @@
-![Rayer](https://github.com/jaxxcoder/Rayer/blob/8d016627b98086786a73b023c53aeb50f592f2b2/Resources/Logo/Rayer-logo.png)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+
