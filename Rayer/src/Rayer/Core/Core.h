@@ -1,0 +1,12 @@
+#pragma once
+
+//////////////////////////////////////
+///////////PLATFORMS/////////////////
+////Windows => GLFWwindow(Using glfw)
+////////////////////////////////////
+
+#ifdef RAYER_PLATFORM_WINDOWS
+
+	#define RAYER_WINDOW GLFWwindow
+
+#endif

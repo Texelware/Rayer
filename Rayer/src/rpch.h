@@ -1,0 +1,11 @@
+#pragma once
+
+
+//////////////////////////////////////
+//////////Precompiled Header/////////
+////////////////////////////////////
+
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <string>

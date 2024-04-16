@@ -1,0 +1,27 @@
+#ignoring visual studio solution files
+*.sln
+
+#Ignoring visual studio generated files
+*.vcxproj
+*.filters
+*.user
+
+#ignoring binary and intermediate binary files
+bin/
+bin-int/
+
+#ignoring dependency binary and intermediate binary files
+Rayer/vendor/GLAD/bin/
+Rayer/vendor/GLAD/bin-int/
+
+Rayer/vendor/GLFW/bin/
+Rayer/vendor/GLFW/bin-int/
+
+Rayer/vendor/ImGui/bin/
+Rayer/vendor/ImGui/bin-int/
+
+#Ignoring the visual studio auto generated folder
+.vs/
+
+#Do not ignore the bin directory inside vendor
+!vendor/bin/
