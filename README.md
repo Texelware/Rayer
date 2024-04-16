@@ -1,10 +1,10 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/jaxxcoder/Rayer/blob/master/Docs/License/GPL3-license.txt)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/jaxxcoder/Rayer/blob/master/GPL3-license.txt)
 
 ![RAYER](https://github.com/jaxxcoder/Rayer/blob/master/Resources/Logo/Rayer-logo.png "RAYER")
 
 ## License
 
-This project is licensed under the terms of the GPL-3.0 license . See LICENSE for more details (Docs/License/GPL3-license.txt).
+This project is licensed under the terms of the GPL-3.0 license . See LICENSE for more details (GPL3-license.txt).
 
 ***
 ## RAYER
