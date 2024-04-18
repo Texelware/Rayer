@@ -1,4 +1,4 @@
-project "SandBox"
+project "RayerEditor"
 
     kind "ConsoleApp"
     language "C++"
@@ -7,17 +7,16 @@ project "SandBox"
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
    
-
-
     files{
 
-        
+        "src/**.h",
         "src/**.cpp"
         
     }
 
     includedirs {
 
+        "src",
         "%{wks.location}/Rayer/src",
         "%{wks.location}/Rayer/vendor/GLFW/include",
         "%{wks.location}/Rayer/vendor/GLAD/include",

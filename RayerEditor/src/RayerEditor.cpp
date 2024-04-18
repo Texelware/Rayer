@@ -1,12 +1,14 @@
 #include <Rayer.h>
 
-class SandBox : public Rayer::Application {
+#include <EditorLayer.h>
+
+class RayerEditor : public Rayer::Application {
 
 public:
 
-	SandBox() {
+	RayerEditor() {
 
-		
+		PushLayer(new Rayer::EditorLayer());
 
 	}
 
@@ -15,7 +17,8 @@ public:
 
 Rayer::Application* Rayer::CreateApplication() {
 
-	return new SandBox();
+	return new RayerEditor();
+
 }
 
 int main() {
@@ -23,8 +26,8 @@ int main() {
 	auto app = Rayer::CreateApplication();
 
 	app->ApplicationLoop();
-	
+
+
 	delete app;
 
-	return 0;
 }

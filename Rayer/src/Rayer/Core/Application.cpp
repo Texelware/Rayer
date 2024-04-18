@@ -5,6 +5,9 @@ namespace Rayer {
 
 	#define BIND_EVENT_FN(x) std::bind(&Application::x , this , std::placeholders::_1)
 
+	//Initialing the static instance variable
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application() {
 
 		m_Window = IWindow::Create();
@@ -15,7 +18,19 @@ namespace Rayer {
 			std::terminate();
 		}
 
+		if (s_Instance == nullptr) {
+
+			s_Instance = this;
+
+		}
+
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		
+
+		//Allocating memory for the ImGui layer object
+		m_ImGuiLayer = new ImGuiLayer();
+		//Pushing it as an overlay
+		PushOverlay(m_ImGuiLayer);
 	
 	}
 
@@ -26,6 +41,21 @@ namespace Rayer {
 
 			m_Window->ClearFrame();
 			m_Window->PoolEvents();
+
+			for (auto layer : m_LayerStack) {
+
+				layer->OnUpdate();
+
+			}
+
+			m_ImGuiLayer->Begin();
+
+				for (auto layer : m_LayerStack) {
+					
+					layer->OnImGuiRender();
+				}
+
+			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 
@@ -48,5 +78,23 @@ namespace Rayer {
 
 		return true;
 	}
+
+
+	//Layer related methods defintions
+	void Application::PushLayer(Layer* layer) {
+
+		//Pushing to the layer stack and immidiately attaching it
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+
+	}
+	void Application::PushOverlay(Layer* overlay) {
+
+		//Pushing to the layer stack and immidiately attaching it
+		m_LayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
+
+	}
+	
 
 }

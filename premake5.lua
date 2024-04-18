@@ -8,7 +8,7 @@ workspace "Rayer"
         "Dist"
     }
 
-    startproject "SandBox"
+    startproject "RayerEditor"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -26,7 +26,14 @@ group "Core"
     
 group ""
 
-group "SandBox" 
+group "Editor"
+
+    include "RayerEditor"
+
+group ""
+
+
+group "Misc" 
 
     include "Sandbox"
 
