@@ -1,6 +1,7 @@
 #pragma once
 #include <Panel/SceneHierarchyPanel.h>
 #include <Panel/ContentBrowserPanel.h>
+#include <Panel/ConsolePanel.h>
 #include <Rayer.h>
 
 namespace Rayer {
@@ -9,13 +10,9 @@ namespace Rayer {
 
 		public:
 
-			EditorLayer() : Layer("EDITOR_LAYER") {
+			EditorLayer();
 
-				//Initializing or allocation memory for unique panel pointers
-				scene_hierarchy_panel = std::make_unique<SceneHierarchyPanel>();
-				content_browser_panel = std::make_unique<ContentBrowserPanel>();
-			
-			}
+		
 
 			virtual void OnImGuiRender() override;
 
@@ -26,6 +23,9 @@ namespace Rayer {
 
 			//Unique pointer to the scene_hierarchy_panel
 			std::unique_ptr<SceneHierarchyPanel> scene_hierarchy_panel;
+
+			//Unique pointer to the console
+			std::unique_ptr<ConsolePanel> console_panel;
 			
 	};
 

@@ -5,6 +5,17 @@
 
 namespace Rayer {
 
+
+	EditorLayer::EditorLayer(): Layer("UI_LAYER") {
+
+
+		//Initializing or allocation memory for unique panel pointers
+		scene_hierarchy_panel = std::make_unique<SceneHierarchyPanel>();
+		content_browser_panel = std::make_unique<ContentBrowserPanel>();
+		console_panel = std::make_unique<ConsolePanel>();
+
+	}
+
 	void EditorLayer::OnImGuiRender() {
 
 		// Note: Switch this to true to enable dockspace
@@ -117,6 +128,7 @@ namespace Rayer {
 
 		scene_hierarchy_panel->OnImGuiRender();
 		content_browser_panel->OnImGuiRender();
+		console_panel->OnImGuiRender();
 
 		//Viewport window
 		ImGui::Begin("Viewport");
