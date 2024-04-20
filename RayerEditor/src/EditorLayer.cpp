@@ -10,9 +10,9 @@ namespace Rayer {
 
 
 		//Initializing or allocation memory for unique panel pointers
-		scene_hierarchy_panel = std::make_unique<SceneHierarchyPanel>();
-		content_browser_panel = std::make_unique<ContentBrowserPanel>();
-		console_panel = std::make_unique<ConsolePanel>();
+		scene_hierarchy_panel = CreateScope<SceneHierarchyPanel>();
+		content_browser_panel = CreateScope<ContentBrowserPanel>();
+		console_panel = CreateScope<ConsolePanel>();
 
 	}
 

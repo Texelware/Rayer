@@ -18,7 +18,9 @@ project "Rayer"
         "src",
         "vendor/GLFW/include",
         "vendor/GLAD/include",
-        "vendor/ImGui/include"
+        "vendor/ImGui/include",
+        "vendor/stb_image/include",
+
     }
 
     defines {
@@ -31,6 +33,7 @@ project "Rayer"
         "GLFW",
         "GLAD",
         "ImGui",
+        "stb_image",
         "opengl32.lib"
     }
 

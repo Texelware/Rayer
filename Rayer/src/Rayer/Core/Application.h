@@ -1,6 +1,8 @@
 #pragma once
 #include <rpch.h>
 
+#include <Rayer/Core/Core.h>
+
 //ImGui Layer
 #include <Rayer/Layer/ImGuiLayer.h>
 
@@ -71,7 +73,7 @@ namespace Rayer {
 		LayerStack m_LayerStack;
 
 		//Window object associated with this application (Platform independent)
-		std::unique_ptr<IWindow> m_Window;
+		Scope<IWindow> m_Window;
 
 		//For the single instance of the application
 		static Application* s_Instance;
