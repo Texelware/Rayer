@@ -39,9 +39,10 @@ namespace Rayer {
 
 		while (m_Running) {
 
-			m_Window->ClearFrame();
 			m_Window->PoolEvents();
 
+			
+			
 			for (auto layer : m_LayerStack) {
 
 				layer->OnUpdate();

@@ -4,6 +4,15 @@
 
 #define BIT(x) (1 << x)
 
+
+#ifdef RAYER_DEBUG
+	#define RAYER_DEBUG_BREAK __debugbreak()
+	
+#else
+	#define RAYER_DEBUG_BREAK
+#endif
+	
+
 //////////////////////////////////////
 ///////////PLATFORMS/////////////////
 ////Windows => GLFWwindow(Using glfw)

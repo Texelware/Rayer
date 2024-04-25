@@ -1,13 +1,13 @@
 #include <imgui.h>
-
+#include <initializer_list>
 #include <EditorLayer.h>
 
 
 namespace Rayer {
 
 
-	EditorLayer::EditorLayer(): Layer("UI_LAYER") {
 
+	EditorLayer::EditorLayer(): Layer("UI_LAYER") {
 
 		//Initializing or allocation memory for unique panel pointers
 		scene_hierarchy_panel = CreateScope<SceneHierarchyPanel>();
@@ -15,6 +15,44 @@ namespace Rayer {
 		console_panel = CreateScope<ConsolePanel>();
 
 	}
+
+
+	void EditorLayer::OnAttach() {
+
+		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
+
+		//Initializing those dummy objects
+		vBuffer = VertexBuffer::Create(vertices, 12 * sizeof(float));
+		iBuffer = IndexBuffer::Create(indices, 6);
+
+		vArray = VertexArray::Create();
+
+		bLayout = new BufferLayout({ {ShaderDataType::Float , "aPosition", false}
+			});
+
+		vBuffer->SetBufferLayout(*bLayout);
+
+		vArray->SetVertexBuffer(vBuffer);
+		vArray->SetIndexBuffer(iBuffer);
+
+
+
+		
+
+	}
+
+	void EditorLayer::OnUpdate() {
+
+
+		MESH_BENCH_ENGINE->SetClearColor({0.0f, 1.0f, 0.5f, 1.0f});
+		MESH_BENCH_ENGINE->Clear();
+		
+
+		MESH_BENCH_ENGINE->DrawIndexed(vArray, 6);
+
+
+	}
+
 
 	void EditorLayer::OnImGuiRender() {
 
@@ -133,10 +171,16 @@ namespace Rayer {
 		//Viewport window
 		ImGui::Begin("Viewport");
 
+			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+			viewportWidth = (uint32_t)viewportSize.x;
+			viewportHeight = (uint32_t)viewportSize.y;
+
+			ImGui::Image((void*)(intptr_t)0, viewportSize);
+
+
 		ImGui::End();
 		
-
-
 		ImGui::End();
 	
 

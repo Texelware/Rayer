@@ -20,6 +20,7 @@ project "Rayer"
         "vendor/GLAD/include",
         "vendor/ImGui/include",
         "vendor/stb_image/include",
+        "vendor/glm"
 
     }
 
@@ -47,6 +48,14 @@ project "Rayer"
             "RAYER_PLATFORM_WINDOWS",
     
         }
+
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+        
+        defines {
+            "RAYER_DEBUG" 
+        } 
 
    
 

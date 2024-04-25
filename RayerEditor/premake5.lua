@@ -20,7 +20,8 @@ project "RayerEditor"
         "%{wks.location}/Rayer/src",
         "%{wks.location}/Rayer/vendor/GLFW/include",
         "%{wks.location}/Rayer/vendor/GLAD/include",
-        "%{wks.location}/Rayer/vendor/ImGui/include"
+        "%{wks.location}/Rayer/vendor/ImGui/include",
+        "%{wks.location}/Rayer/vendor/glm"
     }
 
     links{
@@ -33,6 +34,15 @@ project "RayerEditor"
         cppdialect "C++20"
         staticruntime "off"
         systemversion "latest"
+        
+
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+        defines {
+            "RAYER_DEBUG" 
+        } 
 
         
     

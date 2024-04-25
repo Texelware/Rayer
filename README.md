@@ -25,7 +25,7 @@ Start by cloning the repository with `git clone https://github.com/jaxxcoder/Ray
 
 <ins>**2. Generate Visual Studio project for Windows:**</ins>
 
-1. Run the [Win-Generate-Project.bat](https://github.com/jaxxcoder/Rayer/blob/master/Win-Generate-Project.bat) to generate visual studio project for Windows
+1. Run the [Win-Generate-Project.bat](https://github.com/jaxxcoder/Rayer/blob/master/Win-Generate-Project.bat) to generate visual studio project for Windows .
 
 
 ***

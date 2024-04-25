@@ -1,0 +1,3 @@
+[submodule "Rayer/vendor/glm"]
+	path = Rayer/vendor/glm
+	url = https://github.com/g-truc/glm.git
