@@ -1,6 +1,6 @@
 #include <Rayer/Core/Application.h>
 #include <glad/glad.h>
-#include <Platform/OpenGL/OpenGLBuffer.h>
+#include "OpenGLBuffer.h"
 
 namespace Rayer {
 
