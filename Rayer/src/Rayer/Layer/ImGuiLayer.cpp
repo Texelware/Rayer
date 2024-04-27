@@ -49,13 +49,12 @@ namespace Rayer {
 		SetThemeColors(ThemeType::Dark);
 
 		Application& app = Application::Get();
-		GLFWwindow* window = (RAYER_WINDOW*)(app.GetNativeWindow());
+		GLFWwindow* window = static_cast<RAYER_WINDOW*>(app.GetNativeWindow());
 
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
-
-
+		
 	}
 
 	void ImGuiLayer::OnDetach() {

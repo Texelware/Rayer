@@ -1,4 +1,5 @@
 #include <glad/glad.h>
+#include <Rayer/Core/Assert.h>
 #include "OpenGLFrameBuffer.h"
 
 namespace Rayer {
@@ -11,6 +12,13 @@ namespace Rayer {
 
 	void OpenGLFrameBuffer::Invalidate() {
 		
+		if (m_rendererID != 0) {
+
+			glDeleteFramebuffers(1, &m_rendererID);
+			glDeleteTextures(1, &colorAttachmentID);
+
+		}
+
 		glGenBuffers(1, &m_rendererID);
 		glBindBuffer(GL_FRAMEBUFFER, m_rendererID);
 
@@ -20,6 +28,12 @@ namespace Rayer {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferSpecification.width, bufferSpecification.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, colorAttachmentID, 0);
+
+		
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			
+			RAYER_CORE_ASSERT(false, "There is some issue with framebuffer!");
+		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -42,6 +56,17 @@ namespace Rayer {
 		return colorAttachmentID;
 
 	}
+
+
+	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height) {
+
+		bufferSpecification.width = width;
+		bufferSpecification.height = height;
+
+
+		Invalidate();
+	}
+	
 
 
 

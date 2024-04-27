@@ -24,6 +24,8 @@ namespace Rayer {
 
 		virtual uint32_t GetColorAttachmentID() const = 0;
 
+		virtual void Resize(uint32_t width, uint32_t height) = 0;
+
 
 		static Ref<Framebuffer> Create(const FrameBufferSpecification& spec);
 	};

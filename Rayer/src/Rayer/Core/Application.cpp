@@ -27,6 +27,9 @@ namespace Rayer {
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 		
 
+		//Creating a scene ref
+		m_Scene = CreateRef<Scene>();
+
 		//Allocating memory for the ImGui layer object
 		m_ImGuiLayer = new ImGuiLayer();
 		//Pushing it as an overlay
@@ -41,8 +44,6 @@ namespace Rayer {
 
 			m_Window->PoolEvents();
 
-			
-			
 			for (auto layer : m_LayerStack) {
 
 				layer->OnUpdate();
@@ -69,6 +70,17 @@ namespace Rayer {
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowClosedEvent>(BIND_EVENT_FN(OnWindowClose));
+
+		for (auto it = m_LayerStack.begin(); it != m_LayerStack.end(); ++it) {
+
+			if (e.m_Handled) {
+				
+				break;
+			}
+
+			(*it)->OnEvent(e);
+
+		}
 		
 
 	}

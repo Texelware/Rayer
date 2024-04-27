@@ -14,6 +14,10 @@ namespace Rayer {
 		content_browser_panel = CreateScope<ContentBrowserPanel>();
 		console_panel = CreateScope<ConsolePanel>();
 
+		//Creating platform specific utility
+		platformUtility = PlatformUtils::Create();
+
+
 	}
 
 
@@ -30,25 +34,27 @@ namespace Rayer {
 		bLayout = new BufferLayout({ {ShaderDataType::Float , "aPosition", false}
 			});
 
+		fb = Framebuffer::Create({ 1280 , 720 });
+
 		vBuffer->SetBufferLayout(*bLayout);
 
 		vArray->SetVertexBuffer(vBuffer);
 		vArray->SetIndexBuffer(iBuffer);
 
-
-
-		
-
 	}
 
 	void EditorLayer::OnUpdate() {
 
-
+		fb->Resize(viewportWidth, viewportHeight);
+		fb->Bind();
+		
 		MESH_BENCH_ENGINE->SetClearColor({0.0f, 1.0f, 0.5f, 1.0f});
 		MESH_BENCH_ENGINE->Clear();
 		
-
 		MESH_BENCH_ENGINE->DrawIndexed(vArray, 6);
+
+		fb->Unbind();
+	
 
 
 	}
@@ -125,6 +131,9 @@ namespace Rayer {
 
 			if (ImGui::MenuItem("Open", "Ctrl+O")) {
 
+				
+				m_ProjectOpen = true;
+
 			}
 
 			if (ImGui::MenuItem("Save", "Ctrl+S")) {
@@ -176,14 +185,77 @@ namespace Rayer {
 			viewportWidth = (uint32_t)viewportSize.x;
 			viewportHeight = (uint32_t)viewportSize.y;
 
-			ImGui::Image((void*)(intptr_t)0, viewportSize);
+			ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
 
 
 		ImGui::End();
+
+
+		/////////////////////POPUPS///////////////////
+		if (m_ProjectOpen)
+		{
+			ImGui::OpenPopup("Save?");
+			if (ImGui::BeginPopupModal("Save?", &m_ProjectOpen, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("Do you want to save your changes?\n\n");
+				ImGui::Separator();
+
+				if (ImGui::Button("OK", ImVec2(120, 0))) {
+					
+					//TODO : Implement saving changes logic
+					/**********/
+					/**********/
+					/**********/
+					/**********/
+					/**********/
+
+					m_ProjectOpen = false;
+					FILEPATH filepath = platformUtility->OpenFileDialog(".rayer");
+
+					if (!filepath.empty())
+					{
+						OpenProject(filepath);
+					}
+
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+					ImGui::CloseCurrentPopup();
+					m_ProjectOpen = false;
+					FILEPATH filepath = platformUtility->OpenFileDialog(".rayer");
+
+					if (!filepath.empty())
+					{
+						OpenProject(filepath);
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
 		
 		ImGui::End();
 	
 
 	}
+
+
+	//Project opening method
+	void EditorLayer::OpenProject(FILEPATH& filepath , Ref<Scene> scene) {
+
+		if (filepath.extension() != ".rayer") {
+			std::cout << "Not a valid rayer project" << std::endl;
+			return;
+		}
+
+		//TODO: Load project from file
+		
+	}
+
+
+
+
 
 }

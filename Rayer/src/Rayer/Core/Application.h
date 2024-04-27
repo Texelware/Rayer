@@ -12,6 +12,8 @@
 //Header to include the layerstack
 #include <Rayer/Core/LayerStack.h>
 
+#include <Rayer/Scene/Scene.h>
+
 
 
 
@@ -60,6 +62,8 @@ namespace Rayer {
 			return *m_Window.get();
 		}
 
+		Ref<Scene> GetScene() { return m_Scene; }
+
 
 
 	private:
@@ -80,6 +84,11 @@ namespace Rayer {
 
 		//ImGuiLayer object
 		ImGuiLayer* m_ImGuiLayer;
+
+		//Scene Object
+		Ref<Scene> m_Scene;
+
+		
 
 	};
 

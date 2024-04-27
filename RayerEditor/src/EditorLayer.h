@@ -7,9 +7,12 @@
 
 namespace Rayer {
 
+	
 	class EditorLayer : public Layer{
 
 		public:
+
+			using FILEPATH = std::filesystem::path;
 
 			EditorLayer();
 
@@ -19,7 +22,13 @@ namespace Rayer {
 
 			virtual void OnImGuiRender() override;
 
+			void OpenProject(FILEPATH& filepath , Ref<Scene> scene = Application::Get().GetScene() );
+
+			
+
 		private:
+
+			
 
 			//Unique pointer to the content_browser_panel
 			Scope<ContentBrowserPanel> content_browser_panel;
@@ -61,6 +70,15 @@ namespace Rayer {
 
 			//Refrences to the render engines
 			Scope<MeshBench> MESH_BENCH_ENGINE;
+
+			Ref<Framebuffer> fb;
+
+			Scope<PlatformUtils> platformUtility;
+
+
+			//Project opening boolean
+			bool m_ProjectOpen = false;
+
 	};
 
 }

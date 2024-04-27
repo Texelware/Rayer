@@ -10,3 +10,10 @@
 #include <vector>
 #include <string>
 #include <functional>
+
+#ifdef RAYER_PLATFORM_WINDOWS
+
+	#include <Windows.h>
+
+#endif // RAYER_PLATFORM_WINDOWS
+

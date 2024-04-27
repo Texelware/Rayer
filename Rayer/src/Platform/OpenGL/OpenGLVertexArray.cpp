@@ -39,15 +39,16 @@ namespace Rayer {
 
 		int loc = 0;
 
-		for (auto element : vb->GetBufferLayout()) {
-
+		for (const auto& element : vb->GetBufferLayout()) {
 			glEnableVertexAttribArray(loc);
 			glVertexAttribPointer(loc, element.Size, GL_FLOAT, element.Normalized, vb->GetBufferLayout().GetStride(), (const void*)element.Offset);
 			loc++;
 		}
 
-
 		m_VertexBuffer = vb;
+
+		// It's a good idea to unbind the VAO after setting up vertex attributes
+		glBindVertexArray(0);
 
 	}
 

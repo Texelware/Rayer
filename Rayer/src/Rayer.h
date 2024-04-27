@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Rayer/Renderer/RenderCommand.h>
-
 //Including GLM
 #include <glm/glm.hpp>
 
@@ -12,5 +10,13 @@
 
 #include <Rayer/Core/Core.h>
 
+#include <Rayer/RenderEngine/RenderingPrimitives/Framebuffer.h>
+
 //Important headers for the client side
 #include <Rayer/Core/Application.h> // Contains the main application class
+
+//Include the Platform utility header
+#include <Rayer/Utils/PlatformUtils.h>
+
+//Include the Scene header
+#include <Rayer/Scene/Scene.h>
