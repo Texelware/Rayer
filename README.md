@@ -19,7 +19,7 @@ Visual Studio 2022 recommended, Rayer is officially untested on other developmen
 
 <ins>**1. Downloading the repository:**</ins>
 
-Start by cloning the repository with `git clone https://github.com/jaxxcoder/Rayer.git`.
+Start by cloning the repository with `git clone --recursive https://github.com/jaxxcoder/Rayer.git`.
 
 
 
