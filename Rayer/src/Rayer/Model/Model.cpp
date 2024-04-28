@@ -3,7 +3,7 @@
 
 namespace Rayer {
 
-	Model::Model(std::string _name, Mesh& _mesh) : modelName(_name), mesh(CreateRef<Mesh>(_mesh)) {}
+	Model::Model(std::string _name, Mesh& _mesh) : modelName(_name) {}
 
 	std::string Model::GetModelName() const {
 
@@ -11,9 +11,9 @@ namespace Rayer {
 
 	}
 
-	Ref<Mesh> Model::GetMesh() const {
+	std::vector<Mesh>& Model::GetMeshes()  {
 
-		return mesh;
+		return meshes;
 	}
 
 }

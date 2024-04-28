@@ -14,16 +14,18 @@ namespace Rayer {
 
 
 		//Iterator for models of the scene .
-		using model_interator = std::vector<Ref<Model>>::iterator;
-		using const_model_interator = std::vector<Ref<Model>>::const_iterator;
+		template <typename T>
+		using model_interator = std::vector<Ref<T>>::iterator;
+		template <typename T>
+		using const_model_interator = std::vector<Ref<T>>::const_iterator;
 
 		//For non const iterators
-		model_interator getModelIteratorBegin()  { return m_Models.begin(); }
-		model_interator getModelIteratorEnd()  { return m_Models.end(); }
+		model_interator<Model> getModelIteratorBegin()  { return m_Models.begin(); }
+		model_interator<Model> getModelIteratorEnd()  { return m_Models.end(); }
 
 		//For const iterators
-		const_model_interator getModelIteratorBeginC() const { return m_Models.begin(); }
-		const_model_interator getModelIteratorEndC() const { return m_Models.end(); }
+		const_model_interator<Model> getModelIteratorBeginC() const { return m_Models.begin(); }
+		const_model_interator<Model> getModelIteratorEndC() const { return m_Models.end(); }
 
 
 	private:
