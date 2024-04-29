@@ -18,6 +18,7 @@ group "Dependencies"
     include "Rayer/vendor/GLAD"
     include "Rayer/vendor/ImGui"
     include "Rayer/vendor/stb_image"
+    include "Rayer/vendor/assimp"
 
 group ""
 

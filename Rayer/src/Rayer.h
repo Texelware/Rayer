@@ -20,3 +20,6 @@
 
 //Include the Scene header
 #include <Rayer/Scene/Scene.h>
+
+//Model header
+#include <Rayer/Model/Model.h>

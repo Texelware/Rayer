@@ -3,7 +3,11 @@
 
 namespace Rayer {
 
-	Model::Model(std::string _name, Mesh& _mesh) : modelName(_name) {}
+	Model::Model(const std::string& _name ,const std::filesystem::path& filepath) : modelName(_name) {
+
+		LoadModel(filepath);
+
+	}
 
 	std::string Model::GetModelName() const {
 

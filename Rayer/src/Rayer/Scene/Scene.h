@@ -12,6 +12,7 @@ namespace Rayer {
 
 	public:
 
+		static std::string selectedObjectName;
 
 		//Iterator for models of the scene .
 		template <typename T>
@@ -27,6 +28,7 @@ namespace Rayer {
 		const_model_interator<Model> getModelIteratorBeginC() const { return m_Models.begin(); }
 		const_model_interator<Model> getModelIteratorEndC() const { return m_Models.end(); }
 
+		void AddModel(Ref<Model>& model);
 
 	private:
 

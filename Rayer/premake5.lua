@@ -20,6 +20,7 @@ project "Rayer"
         "vendor/GLAD/include",
         "vendor/ImGui/include",
         "vendor/stb_image/include",
+        "vendor/assimp/include",
         "vendor/glm"
 
     }
@@ -35,6 +36,7 @@ project "Rayer"
         "GLAD",
         "ImGui",
         "stb_image",
+        "assimp",
         "opengl32.lib"
     }
 

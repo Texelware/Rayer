@@ -7,6 +7,14 @@
 
 namespace Rayer {
 
+
+	struct ModelImportConfig {
+
+		std::string format;
+		std::string extension;
+
+	};
+	
 	
 	class EditorLayer : public Layer{
 
@@ -24,7 +32,7 @@ namespace Rayer {
 
 			void OpenProject(FILEPATH& filepath , Ref<Scene> scene = Application::Get().GetScene() );
 
-			
+			void AddNewModel(FILEPATH& filepath , const std::string& extension);
 
 		private:
 
@@ -75,6 +83,7 @@ namespace Rayer {
 
 			Scope<PlatformUtils> platformUtility;
 
+			std::vector<ModelImportConfig> model_import_configs;
 
 			//Project opening boolean
 			bool m_ProjectOpen = false;

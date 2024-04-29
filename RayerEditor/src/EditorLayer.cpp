@@ -9,6 +9,14 @@ namespace Rayer {
 
 	EditorLayer::EditorLayer(): Layer("UI_LAYER") {
 
+		//Add your model imports here 
+		model_import_configs = { 
+
+			{"FBX" , ".fbx"},
+			{"OBJ" , ".obj"}
+
+		};
+
 		//Initializing or allocation memory for unique panel pointers
 		scene_hierarchy_panel = CreateScope<SceneHierarchyPanel>();
 		content_browser_panel = CreateScope<ContentBrowserPanel>();
@@ -111,21 +119,20 @@ namespace Rayer {
 			}
 
 			if (ImGui::BeginMenu("Import")) {
-				if (ImGui::MenuItem("FBX")) {
-					// Action for selecting FBX import
+			
+
+				for (auto element : model_import_configs) {
+
+					if (ImGui::MenuItem(element.format.c_str())) {
+						// Action for selecting model import
+						FILEPATH filepath = platformUtility->OpenFileDialog(element.extension);
+
+						AddNewModel(filepath, element.extension);
+
+					}
 
 				}
-
-				if (ImGui::MenuItem("OBJ")) {
-					// Action for selecting OBJ import
-
-				}
-
-				if (ImGui::MenuItem("GLTF")) {
-					// Action for selecting GLTF import
-
-				}
-
+ 
 				ImGui::EndMenu();
 			}
 
@@ -194,8 +201,8 @@ namespace Rayer {
 		/////////////////////POPUPS///////////////////
 		if (m_ProjectOpen)
 		{
-			ImGui::OpenPopup("Save?");
-			if (ImGui::BeginPopupModal("Save?", &m_ProjectOpen, ImGuiWindowFlags_AlwaysAutoResize))
+			ImGui::OpenPopup("Save");
+			if (ImGui::BeginPopupModal("Save", &m_ProjectOpen, ImGuiWindowFlags_AlwaysAutoResize))
 			{
 				ImGui::Text("Do you want to save your changes?\n\n");
 				ImGui::Separator();
@@ -255,7 +262,31 @@ namespace Rayer {
 	}
 
 
+	void EditorLayer::AddNewModel(FILEPATH& filepath, const std::string& extension) {
 
+		if (filepath.extension() != extension) {
+			std::cout << "Not a valid " << extension << " file" << std::endl;
+			return;
+		}
 
+		std::string modelName = filepath.stem().string();
+		auto beginIt = Application::Get().GetScene()->getModelIteratorBeginC();
+		auto endIt = Application::Get().GetScene()->getModelIteratorEndC();
+
+		// Check if the model name already exists
+		int count = 1;
+		std::string originalName = modelName;
+		while (std::find_if(beginIt, endIt, [&](const Ref<Model>& model) { return model->GetModelName() == modelName; }) != endIt) {
+			modelName = originalName + "_" + std::to_string(count);
+			count++;
+		}
+
+		Ref<Model> model = CreateRef<Model>(modelName, filepath);
+
+		if (model->IsReadSuccessful()) {
+			// Adding a new model into the current scene
+			Application::Get().GetScene()->AddModel(model);
+		}
+	}
 
 }

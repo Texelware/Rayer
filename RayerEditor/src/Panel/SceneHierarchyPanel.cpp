@@ -8,15 +8,29 @@ namespace Rayer {
 	bool SceneHierarchyPanel::showSceneHierarchyPanel = true;
 	bool SceneHierarchyPanel::showScenePropertyPanel = true;
 
+
+	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene) : m_Scene{scene} {}
+
 	void SceneHierarchyPanel::OnImGuiRender() {
 
-		if (showSceneHierarchyPanel) {
+        if (showSceneHierarchyPanel) {
+            ImGui::Begin("Scene Hierarchy", &showSceneHierarchyPanel);
 
-			ImGui::Begin("Scene Hierarchy", &showSceneHierarchyPanel);
+            for (auto it = m_Scene->getModelIteratorBeginC(); it != m_Scene->getModelIteratorEndC(); ++it) {
+                const Ref<Model>& model = *it;
 
-			ImGui::End();
+                // Check if the model is selected or not
+                bool isSelected = (Scene::selectedObjectName == model->GetModelName());
 
-		}
+                // Render selectable item
+                if (ImGui::Selectable(model->GetModelName().c_str(), &isSelected)) {
+                    // If the item is clicked, update the selected object name
+                    Scene::selectedObjectName = model->GetModelName();
+                }
+            }
+
+            ImGui::End();
+        }
 
 		if (showScenePropertyPanel) {
 
