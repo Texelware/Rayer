@@ -21,7 +21,7 @@ Visual Studio 2022 recommended, Rayer is officially untested on other developmen
 
 Start by cloning the repository with `git clone --recursive https://github.com/jaxxcoder/Rayer.git`.
 
-If the repository was cloned non-recursively previously, use git submodule update --init to clone the necessary submodules.
+If the repository was cloned non-recursively previously, use `git submodule update --init` to clone the necessary submodules.
 
 
 <ins>**2. Generate Visual Studio project for Windows:**</ins>
