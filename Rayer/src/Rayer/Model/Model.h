@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <Rayer/RenderEngine/RenderingPrimitives/Buffer.h>
+
 //assimp model loader headers
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -40,6 +42,12 @@ namespace Rayer {
 
 		bool IsReadSuccessful() const { return readStatus; }
 
+		Ref<VertexBuffer>& GetVertexBuffer() { return vertexBuffer; }
+		Ref<IndexBuffer>& GetIndexBuffer() { return indexBuffer; }
+
+
+		uint32_t GetTotalIndexCount() const;
+
 	private:
 
 		std::vector<Mesh> meshes;
@@ -51,6 +59,9 @@ namespace Rayer {
 
 		//Data read status from the model file
 		bool readStatus = false;
+
+		Ref<VertexBuffer> vertexBuffer;
+		Ref<IndexBuffer> indexBuffer;
 
 
 		////////////////////////////////////////////////

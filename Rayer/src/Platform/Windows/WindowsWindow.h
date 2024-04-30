@@ -9,6 +9,9 @@
 //Actual Event includes
 #include <Rayer/Event/ApplicationEvent.h>
 
+#include <Rayer/Event/Event.h>
+#include <Rayer/Event/KeyEvent.h>
+
 
 namespace Rayer {
 

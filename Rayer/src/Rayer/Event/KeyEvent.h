@@ -8,7 +8,7 @@ namespace Rayer {
 	class KeyPressedEvent : public Event {
 
 	public:
-		KeyPressedEvent(int keyCode, int repeatCount) : KeyCode(keyCode), RepeatCount(repeatCount) {}
+		KeyPressedEvent(int keyCode, int repeatCount, bool _isRepeat = false) : KeyCode(keyCode), RepeatCount(repeatCount) , isRepeat(_isRepeat) {}
 
 		virtual std::string ToString() const override {
 
@@ -20,10 +20,13 @@ namespace Rayer {
 		inline int GetRepeatCount() const { return RepeatCount; }
 		inline int GetKeyCode() const { return KeyCode; }
 
+		inline bool IsRepeat() const {return RepeatCount;}
+
 		EVENT_CLASS_TYPE(KeyPressed)
 			EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
 	private:
+		bool isRepeat;
 		int KeyCode, RepeatCount;
 	};
 

@@ -24,6 +24,7 @@ namespace Rayer {
 
 			EditorLayer();
 
+			virtual void OnEvent(Event& e) override;
 			virtual void OnAttach() override;
 
 			virtual void OnUpdate() override;
@@ -34,9 +35,18 @@ namespace Rayer {
 
 			void AddNewModel(FILEPATH& filepath , const std::string& extension);
 
+
+			////////////////////////////////////////////////////////////////
+			//
+			//        Callbacks
+			//
+			///////////////////////////////////////////////////////////////
+
+			bool OnKeyPressed(KeyPressedEvent& e);
+
+
 		private:
 
-			
 
 			//Unique pointer to the content_browser_panel
 			Scope<ContentBrowserPanel> content_browser_panel;
@@ -47,28 +57,11 @@ namespace Rayer {
 			//Unique pointer to the console
 			Scope<ConsolePanel> console_panel;
 
-			uint32_t viewportWidth = 1280;
-			uint32_t viewportHeight = 720;
+			uint32_t viewportWidth{ 1280 };
+			uint32_t viewportHeight{ 720 };
 
-
-			//Dummy vertex and index data => Only for testing
-			float vertices[12] = {
-				// Positions
-				-0.5f,  0.5f, 0.0f, // Top Left
-				 0.5f,  0.5f, 0.0f, // Top Right
-				 0.5f, -0.5f, 0.0f, // Bottom Right
-				-0.5f, -0.5f, 0.0f  // Bottom Left
-			};
-			unsigned int indices[6] = {
-				0, 1, 2, // First Triangle
-				2, 3, 0  // Second Triangle
-			};
-
-			//Dummy objects => Only for testing
-			//VertexBuffer
-			Ref<VertexBuffer> vBuffer;
-			//Index Buffer
-			Ref<IndexBuffer> iBuffer;
+			
+			
 			//VertexArray
 			Ref<VertexArray> vArray;
 
@@ -87,6 +80,10 @@ namespace Rayer {
 
 			//Project opening boolean
 			bool m_ProjectOpen = false;
+
+
+
+
 
 	};
 

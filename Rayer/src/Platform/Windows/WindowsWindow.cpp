@@ -70,6 +70,33 @@ namespace Rayer {
 			});
 
 
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent event(key, 0);
+					data.m_Callback(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent event(key);
+					data.m_Callback(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent event(key, 1 , true);
+					data.m_Callback(event);
+					break;
+				}
+				}
+			});
+
 
 
 		//------------------------Callbacks------------------------

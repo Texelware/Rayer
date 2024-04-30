@@ -33,38 +33,57 @@ namespace Rayer {
 
 		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
 
-		//Initializing those dummy objects
-		vBuffer = VertexBuffer::Create(vertices, 12 * sizeof(float));
-		iBuffer = IndexBuffer::Create(indices, 6);
-
+	
 		vArray = VertexArray::Create();
 
-		bLayout = new BufferLayout({ {ShaderDataType::Float , "aPosition", false}
+		bLayout = new BufferLayout({ 
+			
+			{ShaderDataType::Float , "aPosition", false}
+			
+			
+			
 			});
+
+		
 
 		fb = Framebuffer::Create({ 1280 , 720 });
 
-		vBuffer->SetBufferLayout(*bLayout);
-
-		vArray->SetVertexBuffer(vBuffer);
-		vArray->SetIndexBuffer(iBuffer);
+		
 
 	}
 
 	void EditorLayer::OnUpdate() {
 
+		
+		
 		fb->Resize(viewportWidth, viewportHeight);
 		fb->Bind();
-		
-		MESH_BENCH_ENGINE->SetClearColor({0.0f, 1.0f, 0.5f, 1.0f});
+
+		MESH_BENCH_ENGINE->SetClearColor({ 0.5f, 0.5f, 0.5f, 1.0f });
 		MESH_BENCH_ENGINE->Clear();
+
+
+		// Get the iterators for the models in the scene
+		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
+		auto modelEnd = Application::Get().GetScene()->getModelIteratorEndC();
+
+		if (modelBegin != modelEnd) {
+			// Iterate over the models in the scene and draw each one
+			for (auto modelIt = modelBegin; modelIt != modelEnd; ++modelIt) {
+
+				const Ref<Model> model = *modelIt;
+
+				model->GetVertexBuffer()->SetBufferLayout(*bLayout);
+
+				vArray->SetVertexBuffer(model->GetVertexBuffer());
+				vArray->SetIndexBuffer(model->GetIndexBuffer());
+
+				MESH_BENCH_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+			}
+		}
 		
-		MESH_BENCH_ENGINE->DrawIndexed(vArray, 6);
 
 		fb->Unbind();
-	
-
-
 	}
 
 
@@ -192,6 +211,7 @@ namespace Rayer {
 			viewportWidth = (uint32_t)viewportSize.x;
 			viewportHeight = (uint32_t)viewportSize.y;
 
+
 			ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
 
 
@@ -288,5 +308,45 @@ namespace Rayer {
 			Application::Get().GetScene()->AddModel(model);
 		}
 	}
+
+
+	//////////////////////////////////////////////
+	//////////////////Events/////////////////////
+	////////////////////////////////////////////
+
+	void EditorLayer::OnEvent(Event& e) {
+
+		EventDispatcher dispatcher(e);
+
+		dispatcher.Dispatch<KeyPressedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+
+	}
+
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+		std::cout << e.ToString() << std::endl;
+
+		if (e.IsRepeat())
+			return false;
+
+		// Check if the Ctrl key is pressed
+		static bool ctrlPressed = false;
+		if (e.GetKeyCode() == GLFW_KEY_LEFT_CONTROL || e.GetKeyCode() == GLFW_KEY_RIGHT_CONTROL) {
+			ctrlPressed = true;
+		}
+
+		// Check if Ctrl+N is pressed
+		if (ctrlPressed && e.GetKeyCode() == GLFW_KEY_O) {
+			
+			m_ProjectOpen = true;
+
+			return true;
+
+		}
+
+		return false;
+	}
+
+
 
 }

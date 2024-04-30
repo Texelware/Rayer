@@ -23,3 +23,8 @@
 
 //Model header
 #include <Rayer/Model/Model.h>
+
+
+//Events
+#include <Rayer/Event/Event.h>
+#include <Rayer/Event/KeyEvent.h>
