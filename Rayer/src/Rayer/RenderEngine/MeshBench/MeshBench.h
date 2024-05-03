@@ -8,28 +8,29 @@
 
 namespace Rayer {
 
-	class MeshBench : public RenderEngine{
+    class MeshBench : public RenderEngine {
 
+    public:
 
-		public:
+        MeshBench();
 
-			MeshBench();
+        virtual void SetClearColor(const glm::vec4& color) override;
+        virtual void Clear() override;
 
-			virtual void SetClearColor(const glm::vec4& color) override;
-			virtual void Clear() override;
+        virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count) override;
 
-			virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count) override;
+        // Uniform setting functions
+        void SetShaderMat4(const std::string& name, const glm::mat4& matrix);
+        void SetShaderFloat(const std::string& name, float value);
+        void SetShaderInt(const std::string& name, int value);
 
-		private:
-			
-			Ref<RendererApi> s_Api;
+    private:
 
-			//MeshBench related shader
-			Scope<Shader> m_Shader;
+        Ref<RendererApi> s_Api;
 
-		
+        // MeshBench related shader
+        Scope<Shader> m_Shader;
 
-
-	};
+    };
 
 }

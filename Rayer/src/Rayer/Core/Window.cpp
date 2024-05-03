@@ -7,7 +7,7 @@ namespace Rayer {
 
 		//Platform  independent window creation
 		#ifdef RAYER_PLATFORM_WINDOWS	
-		return std::make_unique <WindowsWindow>(props);
+			return std::make_unique <WindowsWindow>(props);
 		#endif
 
 	}

@@ -1,96 +1,93 @@
-
 #include <Platform/OpenGL/OpenGLShader.h>
 #include <Rayer/Filesystem/FileSystem.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Rayer {
 
-	OpenGLShader::OpenGLShader(std::string vertexShaderPath, std::string fragmentShaderPath) {
-		
-		programID = CreateShader(vertexShaderPath, fragmentShaderPath);
+    OpenGLShader::OpenGLShader(std::string vertexShaderPath, std::string fragmentShaderPath) {
+        programID = CreateShader(vertexShaderPath, fragmentShaderPath);
+    }
 
-	}
+    void OpenGLShader::Bind() const {
+        glUseProgram(programID);
+    }
 
+    void OpenGLShader::Unbind() const {
+        glUseProgram(0);
+    }
 
-	void OpenGLShader::Bind() const {
-		
-		
+    int OpenGLShader::GetID() const {
+        return programID;
+    }
 
-		glUseProgram(programID);
+    int OpenGLShader::CreateShader(std::string vertexShaderPath, std::string fragmentShaderPath) {
+        int program = glCreateProgram();
 
-	}
+        // Storing shader contents in a string
+        std::string vertexShaderSource = RayerFileSystem::ReadFileToString(vertexShaderPath);
+        std::string fragmentShaderSource = RayerFileSystem::ReadFileToString(fragmentShaderPath);
 
-	void OpenGLShader::Unbind() const {
-		
-		glUseProgram(0);
+        // Compiling shaders
+        int vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
+        int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
-	}
+        // Attach the shader
+        glAttachShader(program, vertexShader);
+        glAttachShader(program, fragmentShader);
 
-	int OpenGLShader::GetID() const {
-		
-		return programID;
+        // Link the compiled shaders
+        glLinkProgram(program);
 
-	}
+        int success;
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
 
-	int OpenGLShader::CreateShader(std::string vertexShaderPath, std::string fragmentShaderPath) {
-	
-		int program = glCreateProgram();
+        if (!success) {
+            char infoLog[512];
+            glGetProgramInfoLog(program, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        }
 
-		//Storing shader contents in a string
-		std::string vertexShaderSource = RayerFileSystem::ReadFileToString(vertexShaderPath);
-		std::string fragmentShaderSource = RayerFileSystem::ReadFileToString(fragmentShaderPath);
-		
-		//Compiling shaders
-		int vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
-		int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+        // Delete the shaders as they're linked into our program now and no longer necessary
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
 
-		//Attach the shader
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
+        return program;
+    }
 
-		//Link the compiled shaders
-		glLinkProgram(program);
+    int OpenGLShader::CompileShader(GLenum shaderType, std::string shaderSource) {
+        int shader = glCreateShader(shaderType);
 
-		int success;
+        const char* source = shaderSource.c_str();
 
-		glGetProgramiv(program, GL_LINK_STATUS, &success);
+        glShaderSource(shader, 1, &source, NULL);
+        glCompileShader(shader);
 
-		if (!success) {
+        int success;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
-			char infoLog[512];
-			glGetProgramInfoLog(program, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        if (!success) {
+            char info[512];
+            glGetShaderInfoLog(shader, 512, NULL, info);
+            std::cout << "ERROR::SHADER::" << (shaderType == GL_VERTEX_SHADER ? "VERTEX SHADER" : "GL_FRAGMENT_SHADER") << "::COMPILATION_FAILED\n" << info << std::endl;
+        }
 
-		}
+        return shader;
+    }
 
+    void OpenGLShader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) {
+        GLint location = glGetUniformLocation(programID, name.c_str());
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+    }
 
-		return program;
+    void OpenGLShader::SetUniformFloat(const std::string& name, float value) {
+        GLint location = glGetUniformLocation(programID, name.c_str());
+        glUniform1f(location, value);
+    }
 
-	}
+    void OpenGLShader::SetUniformInt(const std::string& name, int value) {
+        GLint location = glGetUniformLocation(programID, name.c_str());
+        glUniform1i(location, value);
+    }
 
-	int OpenGLShader::CompileShader(GLenum shaderType, std::string shaderSource) {
-		
-		int shader = glCreateShader(shaderType);
-
-		const char* source = shaderSource.c_str();
-
-		glShaderSource(shader, 1, &source, NULL);
-		glCompileShader(shader);
-
-		int success;
-
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-		if (!success) {
-
-			char info[512];
-
-			glGetShaderInfoLog(shader, 512, NULL, info);
-			std::cout << "ERROR::SHADER::" << (shaderType==GL_VERTEX_SHADER ? "VERTEX SHADDRE" : "GL_FRAGMENT_SAHDER") << "::COMPILATION_FAILED\n" << info << std::endl;
-
-		}
-
-
-		return shader;
-
-	}
 }

@@ -54,14 +54,20 @@ namespace Rayer {
 
 	void EditorLayer::OnUpdate() {
 
-		
+		editor_camera.SetViewportSize((float)viewportWidth, (float)viewportHeight);
 		
 		fb->Resize(viewportWidth, viewportHeight);
 		fb->Bind();
 
-		MESH_BENCH_ENGINE->SetClearColor({ 0.5f, 0.5f, 0.5f, 1.0f });
+		MESH_BENCH_ENGINE->SetClearColor({ 0.3f, 0.3f, 0.3f, 1.0f });
 		MESH_BENCH_ENGINE->Clear();
 
+
+		if (m_ViewportState == ViewportState::Hovered || m_ViewportState==ViewportState::Focused) {
+
+			editor_camera.OnUpdate();
+
+		}
 
 		// Get the iterators for the models in the scene
 		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
@@ -77,6 +83,10 @@ namespace Rayer {
 
 				vArray->SetVertexBuffer(model->GetVertexBuffer());
 				vArray->SetIndexBuffer(model->GetIndexBuffer());
+
+				MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
+				MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+				MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
 
 				MESH_BENCH_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
 			}
@@ -212,6 +222,26 @@ namespace Rayer {
 			viewportHeight = (uint32_t)viewportSize.y;
 
 
+			//------------------Viewport State Checking--------------------
+			if (ImGui::IsWindowHovered()) {
+
+				m_ViewportState = ViewportState::Hovered;
+
+			}
+
+			else if (ImGui::IsAnyItemFocused()) {
+
+				m_ViewportState = ViewportState::Focused;
+			}
+			
+			else {
+
+				m_ViewportState = ViewportState::None;
+
+			}
+
+
+
 			ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
 
 
@@ -297,7 +327,7 @@ namespace Rayer {
 		int count = 1;
 		std::string originalName = modelName;
 		while (std::find_if(beginIt, endIt, [&](const Ref<Model>& model) { return model->GetModelName() == modelName; }) != endIt) {
-			modelName = originalName + "_" + std::to_string(count);
+			modelName = originalName + "(" + std::to_string(count) + ")";
 			count++;
 		}
 
@@ -310,11 +340,15 @@ namespace Rayer {
 	}
 
 
-	//////////////////////////////////////////////
-	//////////////////Events/////////////////////
-	////////////////////////////////////////////
+	///////////////////////////////////////////////
+	//////////////////Events//////////////////////
+	/////////////////////////////////////////////
 
 	void EditorLayer::OnEvent(Event& e) {
+
+		if (m_ViewportState == ViewportState::Hovered) {
+			editor_camera.OnEvent(e);
+		}
 
 		EventDispatcher dispatcher(e);
 
@@ -324,7 +358,10 @@ namespace Rayer {
 
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
-		std::cout << e.ToString() << std::endl;
+
+		#ifdef RAYER_DEBUG
+			std::cout << e.ToString() << std::endl;
+		#endif
 
 		if (e.IsRepeat())
 			return false;

@@ -45,7 +45,7 @@ namespace Rayer {
 		Ref<VertexBuffer>& GetVertexBuffer() { return vertexBuffer; }
 		Ref<IndexBuffer>& GetIndexBuffer() { return indexBuffer; }
 
-
+		glm::mat4& GetModelMatrix() { return modelMatrix; }
 		uint32_t GetTotalIndexCount() const;
 
 	private:

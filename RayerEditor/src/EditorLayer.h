@@ -4,6 +4,9 @@
 #include <Panel/ConsolePanel.h>
 #include <Rayer.h>
 
+//Camera header
+#include <Rayer/Camera/EditorCamera.h>
+
 
 namespace Rayer {
 
@@ -12,6 +15,15 @@ namespace Rayer {
 
 		std::string format;
 		std::string extension;
+
+	};
+
+
+	enum class ViewportState {
+
+		None = 0,
+		Hovered,
+		Focused
 
 	};
 	
@@ -57,8 +69,8 @@ namespace Rayer {
 			//Unique pointer to the console
 			Scope<ConsolePanel> console_panel;
 
-			uint32_t viewportWidth{ 1280 };
-			uint32_t viewportHeight{ 720 };
+			uint32_t viewportWidth { 1280 };
+			uint32_t viewportHeight { 720 };
 
 			
 			
@@ -81,9 +93,12 @@ namespace Rayer {
 			//Project opening boolean
 			bool m_ProjectOpen = false;
 
+			//Viewport camera
+			EditorCamera editor_camera;
 
-
-
+			//Viewport state
+			ViewportState m_ViewportState { ViewportState::None };
+			
 
 	};
 

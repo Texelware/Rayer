@@ -6,11 +6,13 @@
 #include <glfw3.h>
 #include <Rayer/Core/Window.h>
 
+#include <Rayer/Core/Core.h>
 //Actual Event includes
 #include <Rayer/Event/ApplicationEvent.h>
 
 #include <Rayer/Event/Event.h>
 #include <Rayer/Event/KeyEvent.h>
+#include <Rayer/Event/MouseEvent.h>
 
 
 namespace Rayer {

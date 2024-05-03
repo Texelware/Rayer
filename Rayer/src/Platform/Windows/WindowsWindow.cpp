@@ -97,6 +97,16 @@ namespace Rayer {
 				}
 			});
 
+		
+
+			glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				MouseScrolledEvent event((float)xOffset, (float)yOffset);
+				data.m_Callback(event);
+			});
+
 
 
 		//------------------------Callbacks------------------------
@@ -178,5 +188,9 @@ namespace Rayer {
 		m_WindowData.m_Callback = callback;
 
 	}
+
+
+
+
 	
 }

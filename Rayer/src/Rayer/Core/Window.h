@@ -7,6 +7,13 @@
 
 namespace Rayer {
 
+
+	enum class CursorType {
+
+		Arrow,
+		Hand
+	};
+
 	//Window property structure with default values
 	struct WindowProperties {
 
@@ -48,6 +55,8 @@ namespace Rayer {
 		virtual unsigned int GetWindowWidth() const = 0;
 		virtual void* GetNativeWindow() = 0;
 		virtual bool IsVSync() const = 0;
+
+	
 
 		//Window Property setting related methods
 		virtual void SetVSync(bool enabled) = 0;

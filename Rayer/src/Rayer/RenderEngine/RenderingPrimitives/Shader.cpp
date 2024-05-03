@@ -1,7 +1,8 @@
 
 #include <Rayer/Core/Assert.h>
 #include <Rayer/Renderer/Renderer.h>
-#include <Rayer/RenderEngine/RenderingPrimitives/Shader.h>
+
+#include "Shader.h"
 #include <Platform/OpenGL/OpenGLShader.h>
 
 namespace Rayer {

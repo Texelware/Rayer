@@ -43,8 +43,8 @@ namespace Rayer {
 			return ss.str();
 		}
 
-		inline float GetX() const { return m_XOffset; }
-		inline float GetY() const { return m_YOffset; }
+		inline float GetXOffset() const { return m_XOffset; }
+		inline float GetYOffset() const { return m_YOffset; }
 
 		EVENT_CLASS_TYPE(MouseScrolled)
 			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
