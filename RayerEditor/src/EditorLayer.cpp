@@ -1,16 +1,21 @@
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <initializer_list>
 #include <EditorLayer.h>
 
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Rayer {
 
+	
 
+	EditorLayer::EditorLayer() : Layer("UI_LAYER") {
 
-	EditorLayer::EditorLayer(): Layer("UI_LAYER") {
+		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
+		RAYER_X_ENGINE = CreateScope<RayerX>();
 
 		//Add your model imports here 
-		model_import_configs = { 
+		model_import_configs = {
 
 			{"FBX" , ".fbx"},
 			{"OBJ" , ".obj"}
@@ -29,45 +34,53 @@ namespace Rayer {
 	}
 
 
+
 	void EditorLayer::OnAttach() {
 
-		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
+		
 
-	
+
 		vArray = VertexArray::Create();
 
-		bLayout = new BufferLayout({ 
-			
-			{ShaderDataType::Float , "aPosition", false}
-			
-			
-			
+		bLayout = new BufferLayout({
+
+			{ShaderDataType::Float3 , "aPosition", false},
+			{ShaderDataType::Float3 , "aNormal", false},
+			{ShaderDataType::Float2 , "UV", false}
+
 			});
 
-		
+
 
 		fb = Framebuffer::Create({ 1280 , 720 });
 
-		
 
 	}
 
 	void EditorLayer::OnUpdate() {
 
+		MESH_BENCH_ENGINE->Init();
+		//MESH_BENCH_ENGINE->SetViewport(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
+		MESH_BENCH_ENGINE->SetViewport(0, 0, viewportWidth, viewportHeight);
+
 		editor_camera.SetViewportSize((float)viewportWidth, (float)viewportHeight);
-		
+
 		fb->Resize(viewportWidth, viewportHeight);
 		fb->Bind();
+
 
 		MESH_BENCH_ENGINE->SetClearColor({ 0.3f, 0.3f, 0.3f, 1.0f });
 		MESH_BENCH_ENGINE->Clear();
 
+		MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
 
-		if (m_ViewportState == ViewportState::Hovered || m_ViewportState==ViewportState::Focused) {
+		if (m_ViewportState == ViewportState::Hovered || m_ViewportState == ViewportState::Focused) {
 
 			editor_camera.OnUpdate();
 
 		}
+
+
 
 		// Get the iterators for the models in the scene
 		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
@@ -84,14 +97,56 @@ namespace Rayer {
 				vArray->SetVertexBuffer(model->GetVertexBuffer());
 				vArray->SetIndexBuffer(model->GetIndexBuffer());
 
-				MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
-				MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-				MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
 
-				MESH_BENCH_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+				
+
+
+				switch (m_ViewType) {
+
+					case ViewType::Solid:
+						MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
+						MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+						MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
+						
+
+						MESH_BENCH_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+
+						break;
+					case ViewType::Wireframe:
+
+						if (model->GetModelName() == Scene::selectedObjectName) {
+
+							MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 0.0, 1.0, 0.0 });
+
+						}
+
+						MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
+						MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+						MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
+						MESH_BENCH_ENGINE->DrawWireframe(vArray, model->GetTotalIndexCount());
+
+						MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+
+						break;
+
+					case ViewType::Rendered:
+
+						RAYER_X_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
+						RAYER_X_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+						RAYER_X_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
+						RAYER_X_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+
+						break;
+
+					
+				}
 			}
 		}
-		
+
+
 
 		fb->Unbind();
 	}
@@ -148,7 +203,7 @@ namespace Rayer {
 			}
 
 			if (ImGui::BeginMenu("Import")) {
-			
+
 
 				for (auto element : model_import_configs) {
 
@@ -161,13 +216,13 @@ namespace Rayer {
 					}
 
 				}
- 
+
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::MenuItem("Open", "Ctrl+O")) {
 
-				
+
 				m_ProjectOpen = true;
 
 			}
@@ -214,35 +269,100 @@ namespace Rayer {
 		console_panel->OnImGuiRender();
 
 		//Viewport window
-		ImGui::Begin("Viewport");
+		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
-			viewportWidth = (uint32_t)viewportSize.x;
-			viewportHeight = (uint32_t)viewportSize.y;
+		// Get the main viewport
 
 
-			//------------------Viewport State Checking--------------------
-			if (ImGui::IsWindowHovered()) {
+		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+		ImVec2 viewportPos = ImGui::GetWindowPos();
 
-				m_ViewportState = ViewportState::Hovered;
+		viewportWidth = (uint32_t)viewportSize.x;
+		viewportHeight = (uint32_t)viewportSize.y;
+
+		viewportPositionX = (uint32_t)viewportPos.x;
+		viewportPositionY = (uint32_t)viewportPos.y;
+
+
+		//------------------Viewport State Checking--------------------
+		if (ImGui::IsWindowHovered()) {
+
+			m_ViewportState = ViewportState::Hovered;
+
+		}
+
+		else if (ImGui::IsAnyItemFocused()) {
+
+			m_ViewportState = ViewportState::Focused;
+		}
+
+		else {
+
+			m_ViewportState = ViewportState::None;
+
+		}
+
+		
+
+
+
+		ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
+
+		// Get the iterators for the models in the scene
+		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
+		auto modelEnd = Application::Get().GetScene()->getModelIteratorEndC();
+
+		if (modelBegin != modelEnd) {
+			// Iterate over the models in the scene and draw each one
+			for (auto modelIt = modelBegin; modelIt != modelEnd; ++modelIt) {
+
+				const Ref<Model> model = *modelIt;
+
+				if (Scene::selectedObjectName == model->GetModelName()) {
+
+					ImGuizmo::BeginFrame();
+
+					ImGuizmo::SetDrawlist();
+
+					ImGuizmo::SetOrthographic(false);
+					ImGuizmo::SetRect(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
+
+					//Handling transformation
+					switch (m_CurrentTransformationType)
+					{
+						
+						case TransformType::None:
+							ImGuizmo::Enable(false);
+							break;
+						case TransformType::TRANSLATE:
+							ImGuizmo::Enable(true);
+							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
+							break;
+
+						case TransformType::ROTATE:
+							ImGuizmo::Enable(true);
+							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::ROTATE, ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
+							break;
+
+						case TransformType::SCALE:
+							ImGuizmo::Enable(true);
+							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::SCALE , ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
+							break;
+
+					}
+					
+
+					
+
+				}
+
+
 
 			}
-
-			else if (ImGui::IsAnyItemFocused()) {
-
-				m_ViewportState = ViewportState::Focused;
-			}
-			
-			else {
-
-				m_ViewportState = ViewportState::None;
-
-			}
-
-
-
-			ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
+		}
 
 
 		ImGui::End();
@@ -258,7 +378,7 @@ namespace Rayer {
 				ImGui::Separator();
 
 				if (ImGui::Button("OK", ImVec2(120, 0))) {
-					
+
 					//TODO : Implement saving changes logic
 					/**********/
 					/**********/
@@ -292,23 +412,24 @@ namespace Rayer {
 			}
 		}
 
-		
+
 		ImGui::End();
-	
+
 
 	}
 
 
 	//Project opening method
-	void EditorLayer::OpenProject(FILEPATH& filepath , Ref<Scene> scene) {
+	void EditorLayer::OpenProject(FILEPATH& filepath, Ref<Scene> scene) {
 
 		if (filepath.extension() != ".rayer") {
 			std::cout << "Not a valid rayer project" << std::endl;
+			
 			return;
 		}
 
 		//TODO: Load project from file
-		
+
 	}
 
 
@@ -316,6 +437,7 @@ namespace Rayer {
 
 		if (filepath.extension() != extension) {
 			std::cout << "Not a valid " << extension << " file" << std::endl;
+		
 			return;
 		}
 
@@ -360,26 +482,110 @@ namespace Rayer {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
 
 		#ifdef RAYER_DEBUG
-			std::cout << e.ToString() << std::endl;
+				std::cout << e.ToString() << std::endl;
 		#endif
 
 		if (e.IsRepeat())
 			return false;
 
-		// Check if the Ctrl key is pressed
-		static bool ctrlPressed = false;
-		if (e.GetKeyCode() == GLFW_KEY_LEFT_CONTROL || e.GetKeyCode() == GLFW_KEY_RIGHT_CONTROL) {
-			ctrlPressed = true;
-		}
 
 		// Check if Ctrl+N is pressed
-		if (ctrlPressed && e.GetKeyCode() == GLFW_KEY_O) {
-			
-			m_ProjectOpen = true;
+		if ((Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl)) && Input::IsKeyPressed(Key::O)) {
 
+			m_ProjectOpen = true;
+			return true;
+		}
+		
+
+		// Check if Alt+W is pressed
+		if ((Input::IsKeyPressed(Key::LeftAlt) || Input::IsKeyPressed(Key::RightAlt)) && Input::IsKeyPressed(Key::W)) {
+
+
+
+			m_ViewType = ViewType::Wireframe;
+
+			return true;
+		}
+
+
+		// Check if Alt+R is pressed
+		if ((Input::IsKeyPressed(Key::LeftAlt) || Input::IsKeyPressed(Key::RightAlt)) && Input::IsKeyPressed(Key::R)) {
+
+
+
+			m_ViewType = ViewType::Rendered;
+			
+
+			return true;
+		}
+
+
+		// Check if Alt+S is pressed
+		if ((Input::IsKeyPressed(Key::LeftAlt) || Input::IsKeyPressed(Key::RightAlt)) && Input::IsKeyPressed(Key::S)) {
+
+
+			m_ViewType = ViewType::Solid;
+		
+
+			return true;
+		}
+		
+		
+		//Changing trasfromation based on currently selected transformation type
+		if (m_ViewportState == ViewportState::Hovered) {
+
+			switch (e.GetKeyCode()) {
+
+				case Key::W :
+				//Switching to translate if [W] key is pressed
+				{
+					if (m_CurrentTransformationType == TransformType::TRANSLATE) {
+						m_CurrentTransformationType = TransformType::None;
+					}
+
+					else {
+						m_CurrentTransformationType = TransformType::TRANSLATE;
+					}
+
+					break;
+
+				}
+
+				case Key::E :
+				//Switching to rotate if [E] key is pressed
+				{
+					if (m_CurrentTransformationType == TransformType::ROTATE) {
+						m_CurrentTransformationType = TransformType::None;
+					}
+
+					else {
+						m_CurrentTransformationType = TransformType::ROTATE;
+					}
+
+					break;
+
+				}
+
+				case Key::R:
+					//Switching to scale if [R] key is pressed
+				{
+					if (m_CurrentTransformationType == TransformType::SCALE) {
+						m_CurrentTransformationType = TransformType::None;
+					}
+
+					else {
+						m_CurrentTransformationType = TransformType::SCALE;
+					}
+
+					break;
+				}
+
+			}
+			
 			return true;
 
 		}
+
 
 		return false;
 	}

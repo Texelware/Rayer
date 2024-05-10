@@ -3,12 +3,35 @@
 
 namespace Rayer {
 
+	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case ShaderDataType::Float:    return GL_FLOAT;
+		case ShaderDataType::Float2:   return GL_FLOAT;
+		case ShaderDataType::Float3:   return GL_FLOAT;
+		case ShaderDataType::Float4:   return GL_FLOAT;
+		case ShaderDataType::Mat3:     return GL_FLOAT;
+		case ShaderDataType::Mat4:     return GL_FLOAT;
+		case ShaderDataType::Int:      return GL_INT;
+		case ShaderDataType::Int2:     return GL_INT;
+		case ShaderDataType::Int3:     return GL_INT;
+		case ShaderDataType::Int4:     return GL_INT;
+		case ShaderDataType::Bool:     return GL_BOOL;
+		}
+
+		RAYER_CORE_ASSERT(false, "Unknown ShaderDataType!");
+		return 0;
+	}
+
 	OpenGLVertexArray::OpenGLVertexArray() {
 
 		
 		glGenVertexArrays(1, &m_RendererID);
 		
 	}
+
+	
 
 
 	OpenGLVertexArray::~OpenGLVertexArray() {
@@ -41,7 +64,7 @@ namespace Rayer {
 
 		for (const auto& element : vb->GetBufferLayout()) {
 			glEnableVertexAttribArray(loc);
-			glVertexAttribPointer(loc, element.Size, GL_FLOAT, element.Normalized, vb->GetBufferLayout().GetStride(), (const void*)element.Offset);
+			glVertexAttribPointer(loc, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized, vb->GetBufferLayout().GetStride(), (const void*)element.Offset);
 			loc++;
 		}
 

@@ -22,6 +22,7 @@ project "RayerEditor"
         "%{wks.location}/Rayer/vendor/GLAD/include",
         "%{wks.location}/Rayer/vendor/ImGui/include",
         "%{wks.location}/Rayer/vendor/assimp/include",
+        "%{wks.location}/Rayer/vendor/ImGuizmo/include",
         "%{wks.location}/Rayer/vendor/glm"
     }
 

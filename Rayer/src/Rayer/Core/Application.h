@@ -15,12 +15,9 @@
 #include <Rayer/Scene/Scene.h>
 
 
-
-
-
 namespace Rayer {
 	
-
+	
 
 	//Main Application class
 	class Application {
@@ -64,7 +61,7 @@ namespace Rayer {
 
 		Ref<Scene> GetScene() { return m_Scene; }
 
-
+		
 
 	private:
 
@@ -88,11 +85,12 @@ namespace Rayer {
 		//Scene Object
 		Ref<Scene> m_Scene;
 
-		
 
 	};
 
 	//Method to create the application object (Should be implemented by the client side
 	Application* CreateApplication();
+
+	
 
 }

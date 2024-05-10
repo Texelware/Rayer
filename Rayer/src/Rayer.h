@@ -5,6 +5,7 @@
 
 //Render Engine Headers
 #include <Rayer/RenderEngine/MeshBench/MeshBench.h>
+#include <Rayer/RenderEngine/RayerX/RayerX.h>
 
 #include <Platform/OpenGL/OpenGLBuffer.h>
 
@@ -28,3 +29,6 @@
 //Events
 #include <Rayer/Event/Event.h>
 #include <Rayer/Event/KeyEvent.h>
+
+#include <Rayer/Core/Input.h>
+#include <Rayer/Core/KeyCodes.h>

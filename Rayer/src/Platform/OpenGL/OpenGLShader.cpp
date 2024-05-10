@@ -85,9 +85,19 @@ namespace Rayer {
         glUniform1f(location, value);
     }
 
+    void OpenGLShader::SetUniformFloat3(const std::string& name, const glm::vec3& value) {
+
+        GLint location = glGetUniformLocation(programID, name.c_str());
+        glUniform3fv(location, 1, glm::value_ptr(value));
+    }
+
     void OpenGLShader::SetUniformInt(const std::string& name, int value) {
         GLint location = glGetUniformLocation(programID, name.c_str());
         glUniform1i(location, value);
     }
 
+    void OpenGLShader::SetUniformBool(const std::string& name, bool value) {
+        GLint location = glGetUniformLocation(programID, name.c_str());
+		glUniform1i(location, value);
+    }
 }

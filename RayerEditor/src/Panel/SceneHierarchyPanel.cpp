@@ -9,7 +9,7 @@ namespace Rayer {
 	bool SceneHierarchyPanel::showScenePropertyPanel = true;
 
 
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene) : m_Scene{scene} {}
+	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene ) : m_Scene{scene} {}
 
 	void SceneHierarchyPanel::OnImGuiRender() {
 
@@ -35,6 +35,8 @@ namespace Rayer {
 		if (showScenePropertyPanel) {
 
 			ImGui::Begin("Properties", &showScenePropertyPanel);
+
+            
 
 			ImGui::End();
 

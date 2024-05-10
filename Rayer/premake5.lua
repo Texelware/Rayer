@@ -37,6 +37,7 @@ project "Rayer"
         "ImGui",
         "stb_image",
         "assimp",
+        "ImGuizmo",
         "opengl32.lib"
     }
 

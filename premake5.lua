@@ -17,6 +17,7 @@ group "Dependencies"
     include "Rayer/vendor/GLFW"
     include "Rayer/vendor/GLAD"
     include "Rayer/vendor/ImGui"
+    include "Rayer/vendor/ImGuizmo"
     include "Rayer/vendor/stb_image"
     include "Rayer/vendor/assimp"
 
