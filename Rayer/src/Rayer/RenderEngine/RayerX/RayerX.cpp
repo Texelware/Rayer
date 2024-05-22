@@ -70,9 +70,29 @@ namespace Rayer {
 		m_Shader->Unbind();
 	}
 
+	void RayerX::SetShaderFloat3(const std::string& name, const glm::vec3& value) {
+
+		m_Shader->Bind();
+		m_Shader->SetUniformFloat3(name, value);
+		m_Shader->Unbind();
+	}
+
+	void RayerX::SetShaderFloat4(const std::string& name, const glm::vec4& value) {
+
+		m_Shader->Bind();
+		m_Shader->SetUniformFloat4(name, value);
+		m_Shader->Unbind();
+	}
+
 	void RayerX::SetShaderInt(const std::string& name, int value) {
 		m_Shader->Bind();
 		m_Shader->SetUniformInt(name, value);
+		m_Shader->Unbind();
+	}
+
+	void RayerX::SetShaderUnsignedInt(const std::string& name, unsigned int value) {
+		m_Shader->Bind();
+		m_Shader->SetUniformUnsignedInt(name , value);
 		m_Shader->Unbind();
 	}
 

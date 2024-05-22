@@ -47,87 +47,92 @@ namespace Rayer {
 	};
 	
 	
-	class EditorLayer : public Layer{
+	class EditorLayer : public Layer {
 
-		public:
+	public:
 
-			using FILEPATH = std::filesystem::path;
+		using FILEPATH = std::filesystem::path;
 
-			EditorLayer();
+		EditorLayer();
 
-			virtual void OnEvent(Event& e) override;
-			virtual void OnAttach() override;
+		virtual void OnEvent(Event& e) override;
+		virtual void OnAttach() override;
 
-			virtual void OnUpdate() override;
+		virtual void OnUpdate() override;
 
-			virtual void OnImGuiRender() override;
+		virtual void OnImGuiRender() override;
 
-			void OpenProject(FILEPATH& filepath , Ref<Scene> scene = Application::Get().GetScene() );
+		void OpenProject(FILEPATH& filepath, Ref<Scene> scene = Application::Get().GetScene());
 
-			void AddNewModel(FILEPATH& filepath , const std::string& extension);
-
-
-			////////////////////////////////////////////////////////////////
-			//
-			//        Callbacks
-			//
-			///////////////////////////////////////////////////////////////
-
-			bool OnKeyPressed(KeyPressedEvent& e);
+		void AddNewModel(FILEPATH& filepath, const std::string& extension);
 
 
-		private:
+		////////////////////////////////////////////////////////////////
+		//
+		//        Callbacks
+		//
+		///////////////////////////////////////////////////////////////
+
+		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnFileDropped(FileDroppedEvent& e);
+
+		
 
 
-			//Unique pointer to the content_browser_panel
-			Scope<ContentBrowserPanel> content_browser_panel;
+	private:
 
-			//Unique pointer to the scene_hierarchy_panel
-			Scope<SceneHierarchyPanel> scene_hierarchy_panel;
 
-			//Unique pointer to the console
-			Scope<ConsolePanel> console_panel;
+		//Unique pointer to the content_browser_panel
+		Scope<ContentBrowserPanel> content_browser_panel;
 
-			//Viewport size
-			uint32_t viewportWidth { 1280 };
-			uint32_t viewportHeight { 720 };
+		//Unique pointer to the scene_hierarchy_panel
+		Scope<SceneHierarchyPanel> scene_hierarchy_panel;
 
-			//Viewport position
-			uint32_t viewportPositionX	{ 0 };
-			uint32_t viewportPositionY	{ 0 };
+		//Unique pointer to the console
+		Scope<ConsolePanel> console_panel;
 
+		//Viewport size
+		uint32_t viewportWidth{ 1280 };
+		uint32_t viewportHeight{ 720 };
+
+		//Viewport position
+		uint32_t viewportPositionX{ 0 };
+		uint32_t viewportPositionY{ 0 };
+
+		glm::vec2 m_ViewportBounds[2];
 			
-			
-			//VertexArray
-			Ref<VertexArray> vArray;
+		//VertexArray
+		Ref<VertexArray> vArray;
 
-			//Dummy object
-			BufferLayout* bLayout;
+		//Dummy object
+		BufferLayout* bLayout;
 
 
-			//Refrences to the render engines
-			Scope<MeshBench> MESH_BENCH_ENGINE;
-			Scope<RayerX> RAYER_X_ENGINE;
+		//Refrences to the render engines
+		Scope<MeshBench> MESH_BENCH_ENGINE;
+		Scope<RayerX> RAYER_X_ENGINE;
 
-			Ref<Framebuffer> fb;
+		Ref<Framebuffer> fb;
 
-			Scope<PlatformUtils> platformUtility;
+		Scope<PlatformUtils> platformUtility;
 
-			std::vector<ModelImportConfig> model_import_configs;
+		std::vector<ModelImportConfig> model_import_configs;
 
-			//Project opening boolean
-			bool m_ProjectOpen = false;
+		//Project opening boolean
+		bool m_ProjectOpen = false;
+		bool m_AboutOpen = false;
 
-			//Viewport camera
-			EditorCamera editor_camera;
+		//Viewport camera
+		EditorCamera editor_camera;
 
-			//Viewport state
-			ViewportState m_ViewportState { ViewportState::None };
-			ViewType m_ViewType{ ViewType::Solid };
+		//Viewport state
+		ViewportState m_ViewportState { ViewportState::None };
+		ViewType m_ViewType{ ViewType::Solid };
 
-			//Current transformation type
-			TransformType m_CurrentTransformationType{ TransformType::None };
+		//Current transformation type
+		TransformType m_CurrentTransformationType{ TransformType::None };
 
+		Ref<Texture2D> rayerLogo;
 
 	};
 

@@ -64,7 +64,8 @@ namespace Rayer {
 
 		for (const auto& element : vb->GetBufferLayout()) {
 			glEnableVertexAttribArray(loc);
-			glVertexAttribPointer(loc, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized, vb->GetBufferLayout().GetStride(), (const void*)element.Offset);
+			glVertexAttribPointer(loc, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized, vb->GetBufferLayout().GetStride(), 
+				(const void*)element.Offset);
 			loc++;
 		}
 
@@ -81,6 +82,7 @@ namespace Rayer {
 		glBindVertexArray(m_RendererID);
 		ib->Bind();
 		m_IndexBuffer = ib;
+		glBindVertexArray(0);
 
 
 	}

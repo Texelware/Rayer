@@ -7,11 +7,17 @@
 
 #include <Rayer/RenderEngine/RenderingPrimitives/Buffer.h>
 
+#include <Rayer/Core/Entity.h>
+
 //assimp model loader headers
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <filesystem>
+
+//Component header
+#include <Rayer/Component/TransformComponent.h>
+#include <Rayer/Component/MaterialComponent.h>
 
 namespace Rayer {
 
@@ -32,13 +38,14 @@ namespace Rayer {
 	};
 
 	
-	class Model {
+	class Model : public Entity{
 
 	public:
-		Model(const std::string& _name ,const std::filesystem::path& filepath);
 
-		std::string GetModelName() const;
-		std::vector<Mesh>& GetMeshes() ;
+		
+
+		Model(const std::string& _name , const int id , const EntityType type , const std::filesystem::path& filepath);
+		std::vector<Mesh>& GetMeshes();
 
 		bool IsReadSuccessful() const { return readStatus; }
 
@@ -52,7 +59,6 @@ namespace Rayer {
 
 		std::vector<Mesh> meshes;
 
-		std::string modelName;
 
 		//The model matrix for the model .
 		glm::mat4 modelMatrix {glm::mat4(1)};
@@ -63,6 +69,7 @@ namespace Rayer {
 		Ref<VertexBuffer> vertexBuffer;
 		Ref<IndexBuffer> indexBuffer;
 
+		
 
 		////////////////////////////////////////////////
 		//////////////Mesh Processing//////////////////

@@ -27,7 +27,9 @@ namespace Rayer {
         virtual void SetUniformFloat(const std::string& name, float value) override;
 
         virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) override;
+        virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
         virtual void SetUniformInt(const std::string& name, int value) override;
+        virtual void SetUniformUnsignedInt(const std::string& name, unsigned int value) override;
         virtual void SetUniformBool(const std::string& name, bool value) override;
 
     private:

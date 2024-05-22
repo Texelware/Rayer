@@ -1,15 +1,22 @@
 #include <imgui.h>
 #include <ImGuizmo.h>
+
 #include <initializer_list>
 #include <EditorLayer.h>
 
+#include <Rayer/Log/Logger.h>
+
 #include <glm/gtc/type_ptr.hpp>
+#include <Rayer/Component/TransformComponent.h>
+
+#include <Rayer/Filesystem/FileSystem.h>
 
 namespace Rayer {
 
 	
-
 	EditorLayer::EditorLayer() : Layer("UI_LAYER") {
+
+		rayerLogo = Texture2D::Create(std::string("assets/logo/Rayer-logo.png"));
 
 		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
 		RAYER_X_ENGINE = CreateScope<RayerX>();
@@ -31,13 +38,19 @@ namespace Rayer {
 		platformUtility = PlatformUtils::Create();
 
 
+		
 	}
 
 
 
 	void EditorLayer::OnAttach() {
 
-		
+		FramebufferSpecification fbSpec;
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
+		fbSpec.Width = 1280;
+		fbSpec.Height = 720;
+
+		fb = Framebuffer::Create(fbSpec);
 
 
 		vArray = VertexArray::Create();
@@ -50,9 +63,6 @@ namespace Rayer {
 
 			});
 
-
-
-		fb = Framebuffer::Create({ 1280 , 720 });
 
 
 	}
@@ -68,76 +78,204 @@ namespace Rayer {
 		fb->Resize(viewportWidth, viewportHeight);
 		fb->Bind();
 
+		
 
 		MESH_BENCH_ENGINE->SetClearColor({ 0.3f, 0.3f, 0.3f, 1.0f });
 		MESH_BENCH_ENGINE->Clear();
+		
 
 		MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+		fb->ClearAttachment(1, -1);
 
 		if (m_ViewportState == ViewportState::Hovered || m_ViewportState == ViewportState::Focused) {
 
 			editor_camera.OnUpdate();
 
+			
+
 		}
 
-
+		
+		
 
 		// Get the iterators for the models in the scene
-		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
-		auto modelEnd = Application::Get().GetScene()->getModelIteratorEndC();
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
 
-		if (modelBegin != modelEnd) {
+		if (entityBegin != entityEnd) {
 			// Iterate over the models in the scene and draw each one
-			for (auto modelIt = modelBegin; modelIt != modelEnd; ++modelIt) {
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
 
-				const Ref<Model> model = *modelIt;
+				
+				const Ref<Entity> entity = *entityIt;
 
-				model->GetVertexBuffer()->SetBufferLayout(*bLayout);
+				switch (entity->GetEntityType()) {
 
-				vArray->SetVertexBuffer(model->GetVertexBuffer());
-				vArray->SetIndexBuffer(model->GetIndexBuffer());
+					case EntityType::Model:
 
+						std::dynamic_pointer_cast<Model>(entity)->GetVertexBuffer()->SetBufferLayout(*bLayout);
+
+
+						vArray->SetVertexBuffer(std::dynamic_pointer_cast<Model>(entity)->GetVertexBuffer());
+						vArray->SetIndexBuffer(std::dynamic_pointer_cast<Model>(entity)->GetIndexBuffer());
+
+				}
 
 				
 
 
+				
 				switch (m_ViewType) {
 
 					case ViewType::Solid:
-						MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
-						MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-						MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
 
-						
+						MESH_BENCH_ENGINE->SetShaderInt("u_EID", entity->GetEntityID());
 
-						MESH_BENCH_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+						switch (entity->GetEntityType()) {
 
-						break;
-					case ViewType::Wireframe:
+							case EntityType::Model:
 
-						if (model->GetModelName() == Scene::selectedObjectName) {
 
-							MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 0.0, 1.0, 0.0 });
+								MESH_BENCH_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+								MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+								MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
 
+								MESH_BENCH_ENGINE->DrawIndexed(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+
+								break;
 						}
 
-						MESH_BENCH_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
-						MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-						MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+						
+						break;
 
-						MESH_BENCH_ENGINE->DrawWireframe(vArray, model->GetTotalIndexCount());
 
-						MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+					case ViewType::Wireframe:
+
+						MESH_BENCH_ENGINE->SetShaderInt("u_EID", entity->GetEntityID());
+
+						switch (entity->GetEntityType()) {
+
+						case EntityType::Model:
+							//Rndering green wireframe to the selected object in wireframe view
+							if (entity->GetEntityID() == Scene::selectedEntityID) {
+
+								MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 0.0, 1.0, 0.0 });
+
+							}
+
+							MESH_BENCH_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+							MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+							MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
+							MESH_BENCH_ENGINE->DrawWireframe(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+
+							MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+
+							break;
+						}
 
 						break;
 
 					case ViewType::Rendered:
 
-						RAYER_X_ENGINE->SetShaderMat4("model", model->GetModelMatrix());
-						RAYER_X_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-						RAYER_X_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+						RAYER_X_ENGINE->SetShaderInt("u_EID", entity->GetEntityID());
 
-						RAYER_X_ENGINE->DrawIndexed(vArray, model->GetTotalIndexCount());
+						switch (entity->GetEntityType()) {
+
+						case EntityType::Model: {
+
+							MaterialComponent* materialComponent = dynamic_cast<MaterialComponent*>(entity->GetComponent(ComponentType::MaterialComponent));
+
+							if (materialComponent) {
+
+								Ref<Material>& material = materialComponent->GetMaterial();
+
+								if (materialComponent->GetMaterial()->GetMaterialType() == MaterialType::BASIC) {
+
+									
+									Ref<BASIC_Material> basicMaterial = std::dynamic_pointer_cast<BASIC_Material>(material);
+
+									RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
+									RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
+
+									RAYER_X_ENGINE->SetShaderFloat4("modelColor", basicMaterial->GetColor());
+								}
+
+								else if(materialComponent->GetMaterial()->GetMaterialType() == MaterialType::PBR) {
+
+									Ref<PBR_Material> pbrMaterial = std::dynamic_pointer_cast<PBR_Material>(material);
+
+									
+
+									if(pbrMaterial->GetTextureAvailabilityStatus().has_albedo && pbrMaterial->GetTextureAvailabilityStatus().has_normal){
+
+										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
+										pbrMaterial->GetMaterialMaps()->normal->Bind(2);
+
+										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+
+										RAYER_X_ENGINE->SetShaderInt("u_DiffuseMap", RAYER_ALBEDO_SLOT);
+										RAYER_X_ENGINE->SetShaderInt("u_NormalMap", RAYER_NORMAL_SLOT);
+
+									}
+
+									if (pbrMaterial->GetTextureAvailabilityStatus().has_albedo) {
+
+										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
+
+
+										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+
+										RAYER_X_ENGINE->SetShaderInt("u_DiffuseMap", RAYER_ALBEDO_SLOT);
+
+									}
+
+
+									if (pbrMaterial->GetTextureAvailabilityStatus().has_normal) {
+
+										pbrMaterial->GetMaterialMaps()->normal->Bind(RAYER_NORMAL_SLOT);
+
+
+										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+
+										RAYER_X_ENGINE->SetShaderInt("u_NormalMap", RAYER_NORMAL_SLOT);
+
+									}
+
+									if (!pbrMaterial->GetTextureAvailabilityStatus().has_albedo && !pbrMaterial->GetTextureAvailabilityStatus().has_normal) {
+
+										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
+										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
+										RAYER_X_ENGINE->SetShaderFloat4("modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
+
+									}
+
+									RAYER_X_ENGINE->SetShaderUnsignedInt("texFlags", pbrMaterial->GetAvailableTextureMaps());
+
+								}
+
+							}
+
+							else {
+
+								RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
+								RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
+								RAYER_X_ENGINE->SetShaderFloat4("modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
+
+
+							}
+
+							RAYER_X_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+							RAYER_X_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+							RAYER_X_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
+							RAYER_X_ENGINE->DrawIndexed(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+							break;
+						}
+						}
 
 						break;
 
@@ -146,7 +284,37 @@ namespace Rayer {
 			}
 		}
 
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		my = viewportSize.y - my;
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
 
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = fb->ReadPixel(1, mouseX, mouseY);
+
+			if (Input::IsMouseButtonPressed(Mouse::Button0)) {
+				Scene::selectedEntityID = pixelData == -1 ? -1 : pixelData;
+			}
+		}
+
+		if (m_ViewportState == ViewportState::Hovered) {
+
+			//Delete entities when window is hovered and delete key is pressed 
+			if (Input::IsKeyPressed(Key::Delete)) {
+
+				if (Scene::selectedEntityID != -1) {
+
+					Application::Get().GetScene()->RemoveEntity(Scene::selectedEntityID);
+
+				}
+
+			}
+
+		}
 
 		fb->Unbind();
 	}
@@ -254,10 +422,11 @@ namespace Rayer {
 		}
 
 
+
 		if (ImGui::BeginMenu("Help")) {
 			if (ImGui::MenuItem("About Rayer")) {
 				// Set a flag to open the popup
-
+				m_AboutOpen = true;
 			}
 			ImGui::EndMenu();
 		}
@@ -268,11 +437,15 @@ namespace Rayer {
 		content_browser_panel->OnImGuiRender();
 		console_panel->OnImGuiRender();
 
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		//Viewport window
 		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-		// Get the main viewport
-
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 		ImVec2 viewportPos = ImGui::GetWindowPos();
@@ -285,16 +458,21 @@ namespace Rayer {
 
 
 		//------------------Viewport State Checking--------------------
+
+
 		if (ImGui::IsWindowHovered()) {
 
 			m_ViewportState = ViewportState::Hovered;
 
 		}
 
+		
 		else if (ImGui::IsAnyItemFocused()) {
 
 			m_ViewportState = ViewportState::Focused;
 		}
+
+		
 
 		else {
 
@@ -306,52 +484,129 @@ namespace Rayer {
 
 
 
-		ImGui::Image((void*)fb->GetColorAttachmentID(), viewportSize);
+		ImGui::Image(ImTextureID((void*)fb->GetColorAttachmentRendererID()), viewportSize , ImVec2(0, 1), ImVec2(1, 0));
+
+
+		
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+
+				// Find the last occurrence of a dot in the path
+				const wchar_t* extension = wcsrchr(path, L'.');
+
+				if (extension != nullptr)
+				{
+					// Compare the extension with desired extensions
+					if (wcscmp(extension, L".obj") == 0)
+					{
+						// Handle .obj files
+						fs::path _filePath = path;
+						AddNewModel(_filePath , ".obj");
+
+						#ifdef RAYER_DEBUG
+
+						std::cout << "Dragged a .obj file" << std::endl;
+
+						#endif
+
+					}
+					
+				}
+
+				else
+				{
+					
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		
 
 		// Get the iterators for the models in the scene
-		auto modelBegin = Application::Get().GetScene()->getModelIteratorBeginC();
-		auto modelEnd = Application::Get().GetScene()->getModelIteratorEndC();
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
 
-		if (modelBegin != modelEnd) {
+		if (entityBegin != entityEnd) {
 			// Iterate over the models in the scene and draw each one
-			for (auto modelIt = modelBegin; modelIt != modelEnd; ++modelIt) {
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
 
-				const Ref<Model> model = *modelIt;
+				const Ref<Entity> entity = *entityIt;
 
-				if (Scene::selectedObjectName == model->GetModelName()) {
+				if (Scene::selectedEntityID == entity->GetEntityID()) {
 
 					ImGuizmo::BeginFrame();
 
 					ImGuizmo::SetDrawlist();
 
 					ImGuizmo::SetOrthographic(false);
-					ImGuizmo::SetRect(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
+					ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
+
+					TransformComponent* transformation = dynamic_cast<TransformComponent*>(entity->GetComponent(ComponentType::TransformComponent));
+
+					if (transformation == nullptr) {
+
+						std::cout << "No Transform component found!" << std::endl;
+
+					}
+
+					
 					//Handling transformation
 					switch (m_CurrentTransformationType)
 					{
 						
+					
+
 						case TransformType::None:
 							ImGuizmo::Enable(false);
 							break;
 						case TransformType::TRANSLATE:
-							ImGuizmo::Enable(true);
-							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
-								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
+
+							switch (entity->GetEntityType()) {
+
+							case EntityType::Model:
+
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, 
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
+							}
+							
 							break;
 
 						case TransformType::ROTATE:
-							ImGuizmo::Enable(true);
-							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
-								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::ROTATE, ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
+
+							switch (entity->GetEntityType()) {
+
+							case EntityType::Model:
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::ROTATE, ImGuizmo::WORLD, 
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
+							}
+
 							break;
 
 						case TransformType::SCALE:
-							ImGuizmo::Enable(true);
-							ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
-								glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::SCALE , ImGuizmo::WORLD, glm::value_ptr(model->GetModelMatrix()));
-							break;
 
+							switch (entity->GetEntityType()) {
+
+							case EntityType::Model:
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::SCALE, ImGuizmo::WORLD, 
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
+							}
+
+							break;
 					}
 					
 
@@ -367,6 +622,7 @@ namespace Rayer {
 
 		ImGui::End();
 
+		ImGui::PopStyleVar();
 
 		/////////////////////POPUPS///////////////////
 		if (m_ProjectOpen)
@@ -413,6 +669,24 @@ namespace Rayer {
 		}
 
 
+
+		if (m_AboutOpen)
+		{
+			ImGui::OpenPopup("About");
+			if (ImGui::BeginPopupModal("About", &m_AboutOpen, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Image(ImTextureID(rayerLogo->GetRendererID()), ImVec2(100, 100) , ImVec2(0, 1), ImVec2(1, 0));
+				ImGui::Separator();
+
+				ImGui::Text("Version : Development Version.");
+				ImGui::Separator();
+				ImGui::Text("Icons by : Icons8.");
+
+				ImGui::EndPopup();
+			}
+		}
+
+
 		ImGui::End();
 
 
@@ -423,8 +697,12 @@ namespace Rayer {
 	void EditorLayer::OpenProject(FILEPATH& filepath, Ref<Scene> scene) {
 
 		if (filepath.extension() != ".rayer") {
-			std::cout << "Not a valid rayer project" << std::endl;
-			
+
+			#ifdef RAYER_DEBUG
+				std::cout << "Not a valid rayer project" << std::endl;
+			#endif
+
+			LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Not a valid rayer project")});
 			return;
 		}
 
@@ -436,29 +714,43 @@ namespace Rayer {
 	void EditorLayer::AddNewModel(FILEPATH& filepath, const std::string& extension) {
 
 		if (filepath.extension() != extension) {
-			std::cout << "Not a valid " << extension << " file" << std::endl;
-		
+
+			#ifdef RAYER_DEBUG
+				std::cout << "Not a valid " << extension << " file" << std::endl;
+			#endif
+			std::string msg = "Not a valid " + extension + " file";
+
+			LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , msg });
+
 			return;
 		}
 
-		std::string modelName = filepath.stem().string();
-		auto beginIt = Application::Get().GetScene()->getModelIteratorBeginC();
-		auto endIt = Application::Get().GetScene()->getModelIteratorEndC();
+		std::string entityName = filepath.stem().string();
+		auto beginIt = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto endIt = Application::Get().GetScene()->getEntityIteratorEndC();
 
 		// Check if the model name already exists
 		int count = 1;
-		std::string originalName = modelName;
-		while (std::find_if(beginIt, endIt, [&](const Ref<Model>& model) { return model->GetModelName() == modelName; }) != endIt) {
-			modelName = originalName + "(" + std::to_string(count) + ")";
+		std::string originalName = entityName;
+		while (std::find_if(beginIt, endIt, [&](const Ref<Entity>& entity) { return entity->GetEntityName() == entityName; }) != endIt) {
+			entityName = originalName + "(" + std::to_string(count) + ")";
 			count++;
 		}
 
-		Ref<Model> model = CreateRef<Model>(modelName, filepath);
-
-		if (model->IsReadSuccessful()) {
+		Ref<Entity> model = CreateRef<Model>(entityName, Scene::nextEntityID ,  EntityType::Model, filepath);
+		Scene::nextEntityID++;
+		
+		if (std::dynamic_pointer_cast<Model>(model)->IsReadSuccessful()) {
 			// Adding a new model into the current scene
-			Application::Get().GetScene()->AddModel(model);
+			Application::Get().GetScene()->AddEntity(model);
 		}
+
+		else {
+
+
+		}
+
+
 	}
 
 
@@ -468,13 +760,15 @@ namespace Rayer {
 
 	void EditorLayer::OnEvent(Event& e) {
 
-		if (m_ViewportState == ViewportState::Hovered) {
+		if (m_ViewportState == ViewportState::Hovered || m_ViewportState == ViewportState::Focused) {
 			editor_camera.OnEvent(e);
 		}
 
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<KeyPressedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<FileDroppedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnFileDropped));
+	
 
 	}
 
@@ -590,6 +884,19 @@ namespace Rayer {
 		return false;
 	}
 
+	bool EditorLayer::OnFileDropped(FileDroppedEvent& e) {
 
+		#ifdef RAYER_DEBUG
+				std::cout << e.ToString() << std::endl;
+		#endif // RAYER_DEBUG
+
+
+		content_browser_panel->OnFileDropped(e.GetFileCount(), e.GetPaths());
+
+		return true;
+
+	}
+
+	
 
 }

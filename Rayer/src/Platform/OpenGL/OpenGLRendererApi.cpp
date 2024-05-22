@@ -9,14 +9,19 @@ namespace Rayer {
 
 	void OpenGLRendererApi::Init() {
 
-	
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_SMOOTH);
+		
+		glDepthFunc(GL_LESS);
+
 		// Enable backface culling
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_LINE_SMOOTH);
+
 
 	}
 
@@ -35,8 +40,7 @@ namespace Rayer {
 
 	void OpenGLRendererApi::Clear() {
 
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 
 	}
@@ -46,8 +50,9 @@ namespace Rayer {
 		
 		vertexArray->Bind();
 
-	
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+
+		vertexArray->Unbind();
 		
 	
 	}

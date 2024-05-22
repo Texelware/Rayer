@@ -4,7 +4,7 @@
 
 namespace Rayer {
 
-	Model::Model(const std::string& _name ,const std::filesystem::path& filepath) : modelName(_name) {
+	Model::Model(const std::string& _name ,const int id, const EntityType type ,const std::filesystem::path& filepath) : Entity(_name, id , type) {
 
 		LoadModel(filepath);
 
@@ -41,13 +41,16 @@ namespace Rayer {
         vertexBuffer = VertexBuffer::Create(vertexData.data(), static_cast<uint32_t>(vertexData.size() * sizeof(float)));
         // Create an IndexBuffer using the index data
         indexBuffer = IndexBuffer::Create(indexData.data(), static_cast<uint32_t>(indexData.size()));
+
+       
+        AddComponent(new TransformComponent(modelMatrix));
+        //AddComponent(new MaterialComponent());
+
+
+
 	}
 
-	std::string Model::GetModelName() const {
-
-		return modelName;
-
-	}
+	
 
 	std::vector<Mesh>& Model::GetMeshes()  {
 

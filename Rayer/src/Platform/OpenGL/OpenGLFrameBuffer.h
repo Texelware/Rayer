@@ -8,26 +8,37 @@ namespace Rayer {
 
 	public:
 
-		OpenGLFrameBuffer(const FrameBufferSpecification& spec);
+		OpenGLFrameBuffer(const FramebufferSpecification& spec);
 
 		virtual void Bind() override;
 		virtual void Unbind() override;
 
-		virtual uint32_t GetColorAttachmentID() const override;
-
+		
 		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
+
+		virtual void ClearAttachment(uint32_t attachmentIndex, int value) override;
+
+		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override {  return m_ColorAttachments[index]; }
+
+		virtual const FramebufferSpecification& GetSpecification() const override { return bufferSpecification; }
 
 		void Invalidate();
 		
 	private:
 		//Framebuffer specification
-		FrameBufferSpecification bufferSpecification;
+		FramebufferSpecification bufferSpecification;
 
-		//Color attachment ID
-		uint32_t colorAttachmentID;
 
 		//Framebuffer ID
-		uint32_t m_rendererID = 0;
+		uint32_t m_RendererID = 0;
+
+		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
+		FramebufferTextureSpecification m_DepthAttachmentSpecification = FramebufferTextureFormat::None;
+
+		std::vector<uint32_t> m_ColorAttachments;
+		uint32_t m_DepthAttachment = 0;
 
 	};
 

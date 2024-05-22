@@ -28,8 +28,10 @@ namespace Rayer {
 		// Uniform setting functions
 		void SetShaderMat4(const std::string& name, const glm::mat4& matrix);
 		void SetShaderFloat(const std::string& name, float value);
-
+		void SetShaderFloat3(const std::string& name, const glm::vec3& value);
+		void SetShaderFloat4(const std::string& name, const glm::vec4& value);
 		void SetShaderInt(const std::string& name, int value);
+		void SetShaderUnsignedInt(const std::string& name, unsigned int value);
 		void SetShaderBool(const std::string& name, bool value);
 
 	private:

@@ -42,8 +42,8 @@ namespace Rayer {
 
 
 		//Window creation hint for glfw
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
@@ -107,6 +107,35 @@ namespace Rayer {
 				data.m_Callback(event);
 			});
 
+			glfwSetDropCallback(m_Window, [](GLFWwindow* window, int count, const char** paths){
+
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				FileDroppedEvent event(count, paths);
+				data.m_Callback(event);
+
+			});
+
+			glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+				{
+					WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+					switch (action)
+					{
+					case GLFW_PRESS:
+					{
+						MouseButtonPressedEvent event(button);
+						data.m_Callback(event);
+						break;
+					}
+					case GLFW_RELEASE:
+					{
+						MouseButtonReleasedEvent event(button);
+						data.m_Callback(event);
+						break;
+					}
+					}
+				});
 
 
 		//------------------------Callbacks------------------------

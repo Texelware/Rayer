@@ -29,6 +29,7 @@
 //Events
 #include <Rayer/Event/Event.h>
 #include <Rayer/Event/KeyEvent.h>
+#include <Rayer/Event/MouseEvent.h>
 
 #include <Rayer/Core/Input.h>
 #include <Rayer/Core/KeyCodes.h>

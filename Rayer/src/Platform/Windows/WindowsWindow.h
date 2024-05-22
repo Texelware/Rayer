@@ -13,6 +13,7 @@
 #include <Rayer/Event/Event.h>
 #include <Rayer/Event/KeyEvent.h>
 #include <Rayer/Event/MouseEvent.h>
+#include <Rayer/Event/FileEvent.h>
 
 
 namespace Rayer {

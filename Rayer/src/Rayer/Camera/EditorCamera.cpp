@@ -80,8 +80,8 @@ namespace Rayer {
 	void EditorCamera::MousePan(const glm::vec2& delta)
 	{
 		auto [xSpeed, ySpeed] = PanSpeed();
-		m_FocalPoint += GetRightDirection() * -delta.x * xSpeed * m_Distance;
-		m_FocalPoint += -GetUpDirection() * delta.y * ySpeed * m_Distance;
+		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * m_Distance;
+		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance;
 	}
 
 

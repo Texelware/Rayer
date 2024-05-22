@@ -2,12 +2,35 @@
 
 namespace Rayer {
 
-	std::string Scene::selectedObjectName{};
+	std::string Scene::selectedEntityName{};
 
-	void Scene::AddModel(Ref<Model>& model) {
+	int Scene::selectedEntityID = -1;
 
-		m_Models.push_back(std::move(model));
+	int Scene::nextEntityID = 0;
+
+	void Scene::AddEntity(Ref<Entity>& entity) {
+
+		m_Entities.push_back(std::move(entity));
 	
+	}
+
+	void Scene::RemoveEntity(int entityID) {
+
+		if (!m_Entities.empty()) {
+
+			for (auto it = m_Entities.begin(); it != m_Entities.end(); it++) {
+
+				Ref<Entity> entity = *it;
+
+				if (entity->GetEntityID() == Scene::selectedEntityID) {
+
+					m_Entities.erase(it);
+					break;
+				}
+			}
+
+		}
+
 	}
 
 }
