@@ -13,6 +13,7 @@ namespace Rayer {
 		RGBA8,
 		RED_INTEGER,
 
+		DEPTH_COMPONENT24,
 		// Depth/stencil
 		DEPTH24STENCIL8,
 
@@ -65,6 +66,7 @@ namespace Rayer {
 
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
+		virtual uint32_t GetDepthAttachmentID() const = 0;
 
 		
 

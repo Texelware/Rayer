@@ -8,6 +8,7 @@
 #include <Rayer/Camera/EditorCamera.h>
 
 
+
 namespace Rayer {
 
 	
@@ -74,9 +75,16 @@ namespace Rayer {
 		///////////////////////////////////////////////////////////////
 
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		bool OnFileDropped(FileDroppedEvent& e);
 
-		
+		//Setting light uniforms
+		void SetDirectionalLightUniform();
+		void SetPointLightUniform();
+
+
+		//Function for drawing shadows
+		void DrawShadows();
 
 
 	private:
@@ -101,18 +109,27 @@ namespace Rayer {
 
 		glm::vec2 m_ViewportBounds[2];
 			
-		//VertexArray
+		//VertexArray for objects
 		Ref<VertexArray> vArray;
+
+		//VertexArray for skybox
+		Ref<VertexArray> skyboxArray;
 
 		//Dummy object
 		BufferLayout* bLayout;
+		BufferLayout* bSkyboxLayout;
+
+		bool enableSelection { true };
 
 
 		//Refrences to the render engines
 		Scope<MeshBench> MESH_BENCH_ENGINE;
 		Scope<RayerX> RAYER_X_ENGINE;
 
+		//Framebuffer for viewport
 		Ref<Framebuffer> fb;
+
+		
 
 		Scope<PlatformUtils> platformUtility;
 
@@ -134,6 +151,10 @@ namespace Rayer {
 
 		Ref<Texture2D> rayerLogo;
 
+		
+	
+
+		Ref<Model> modelSpheremap;
 	};
 
 }

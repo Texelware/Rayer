@@ -6,6 +6,8 @@
 
 #define RAYER_ALBEDO_SLOT 1
 #define RAYER_NORMAL_SLOT 2
+#define RAYER_ENVIRONMENT_MAP_SLOT 9
+#define RAYER_SHADOW_MAP_SLOT 10
 
 namespace Rayer {
 

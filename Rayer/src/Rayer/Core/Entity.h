@@ -4,6 +4,7 @@
 
 #include <Rayer/Component/Component.h>
 
+
 namespace Rayer {
 
 	enum class EntityType {
@@ -24,7 +25,7 @@ namespace Rayer {
 		using const_iterator = std::vector<T>::const_iterator;
 
 		Entity() = default;
-		Entity(const std::string& _name, int _id , EntityType _type) : name(_name), type(_type) , id(_id) {}
+		Entity(const std::string& _name, int _id , EntityType _type);
 
 		virtual ~Entity() {
 		
@@ -35,6 +36,8 @@ namespace Rayer {
 			components.clear();
 
 		};
+
+		
 
 		EntityType GetEntityType() const { return type; }
 		std::string GetEntityName() const { return name; }

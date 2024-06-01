@@ -130,6 +130,7 @@ namespace Rayer {
 
 					
 				}
+
 				else if (p.is_regular_file()) {
 
 					if (path.extension() == ".obj" || path.extension() == ".fbx") {
@@ -155,6 +156,8 @@ namespace Rayer {
 					}
 
 				}
+
+				
 
 				if (ImGui::BeginDragDropSource())
 				{

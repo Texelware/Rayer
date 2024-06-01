@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 
+
 namespace Rayer {
 
 
@@ -28,12 +29,16 @@ namespace Rayer {
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 		
 		virtual void Clear() = 0;
+		virtual void ClearDepth() = 0;
 		
 
 		//Rendering related methods
+		virtual void DrawSkybox(const Ref<VertexArray>& vertexArray, uint32_t count) = 0;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count) = 0;
 		virtual void DrawWireframe(const Ref<VertexArray>& vertexArray, uint32_t count) = 0;
 		virtual void DrawLine(const Ref<VertexArray>& vertexArray, uint32_t count) = 0;
+
+		virtual void BindTextureToUnit(uint32_t slot, uint32_t texID) = 0;
 
 		static Api GetApi() { return s_Api; }
 

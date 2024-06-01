@@ -15,6 +15,12 @@ namespace Rayer {
 		static std::string selectedEntityName;
 		static int selectedEntityID;
 
+		//Refrence to the directional light
+		static Ref<Entity> directionalLight;
+
+		//Light count
+		static int directionalLightCount;
+		static int pointLightCount;
 
 		static int nextEntityID;
 

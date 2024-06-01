@@ -11,6 +11,8 @@
 
 #include <Rayer/Filesystem/FileSystem.h>
 
+#include <Rayer/Component/SkyLightComponent.h>
+
 namespace Rayer {
 
 	
@@ -20,6 +22,7 @@ namespace Rayer {
 
 		MESH_BENCH_ENGINE = CreateScope<MeshBench>();
 		RAYER_X_ENGINE = CreateScope<RayerX>();
+		
 
 		//Add your model imports here 
 		model_import_configs = {
@@ -42,7 +45,7 @@ namespace Rayer {
 	}
 
 
-
+	 
 	void EditorLayer::OnAttach() {
 
 		FramebufferSpecification fbSpec;
@@ -53,23 +56,51 @@ namespace Rayer {
 		fb = Framebuffer::Create(fbSpec);
 
 
-		vArray = VertexArray::Create();
+		
 
+		//Vertex Arrays
+		vArray = VertexArray::Create();
+		skyboxArray = VertexArray::Create();
+		modelSpheremap = CreateRef<Model>("Sphereemap", -1, EntityType::Model, fs::path("assets/primitives/EnvironmentMap.obj"));
+
+		
+
+		//Buffer layout for meshes
 		bLayout = new BufferLayout({
 
 			{ShaderDataType::Float3 , "aPosition", false},
 			{ShaderDataType::Float3 , "aNormal", false},
 			{ShaderDataType::Float2 , "UV", false}
 
+		});
+
+
+		//Buffer layout for the skybox
+		bSkyboxLayout = new BufferLayout({
+
+			{ShaderDataType::Float3 , "aPosition", false}
+
 			});
 
+		
+		modelSpheremap->GetVertexBuffer()->SetBufferLayout(*bLayout);
 
+		//Setting the buffers (Vertex and Index buffer)
+		skyboxArray->SetVertexBuffer(modelSpheremap->GetVertexBuffer());
+		skyboxArray->SetIndexBuffer(modelSpheremap->GetIndexBuffer());
+
+		
 
 	}
 
 	void EditorLayer::OnUpdate() {
 
+		
+
 		MESH_BENCH_ENGINE->Init();
+
+
+	
 		//MESH_BENCH_ENGINE->SetViewport(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
 		MESH_BENCH_ENGINE->SetViewport(0, 0, viewportWidth, viewportHeight);
 
@@ -79,7 +110,6 @@ namespace Rayer {
 		fb->Bind();
 
 		
-
 		MESH_BENCH_ENGINE->SetClearColor({ 0.3f, 0.3f, 0.3f, 1.0f });
 		MESH_BENCH_ENGINE->Clear();
 		
@@ -91,13 +121,9 @@ namespace Rayer {
 
 			editor_camera.OnUpdate();
 
-			
-
 		}
 
 		
-		
-
 		// Get the iterators for the models in the scene
 		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
 		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
@@ -113,6 +139,7 @@ namespace Rayer {
 
 					case EntityType::Model:
 
+						//Setting the buffer layout
 						std::dynamic_pointer_cast<Model>(entity)->GetVertexBuffer()->SetBufferLayout(*bLayout);
 
 
@@ -178,13 +205,21 @@ namespace Rayer {
 
 					case ViewType::Rendered:
 
-						RAYER_X_ENGINE->SetShaderInt("u_EID", entity->GetEntityID());
+						
 
+						RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default ,"u_EID", entity->GetEntityID());
+
+
+
+						
 						switch (entity->GetEntityType()) {
 
 						case EntityType::Model: {
 
+							
+
 							MaterialComponent* materialComponent = dynamic_cast<MaterialComponent*>(entity->GetComponent(ComponentType::MaterialComponent));
+
 
 							if (materialComponent) {
 
@@ -195,10 +230,10 @@ namespace Rayer {
 									
 									Ref<BASIC_Material> basicMaterial = std::dynamic_pointer_cast<BASIC_Material>(material);
 
-									RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
-									RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
+									RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default,"u_IsBasic", true);
+									RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default,"u_IsPBR", false);
 
-									RAYER_X_ENGINE->SetShaderFloat4("modelColor", basicMaterial->GetColor());
+									RAYER_X_ENGINE->SetShaderFloat4(RayerXShaderType::Default,"modelColor", basicMaterial->GetColor());
 								}
 
 								else if(materialComponent->GetMaterial()->GetMaterialType() == MaterialType::PBR) {
@@ -212,11 +247,11 @@ namespace Rayer {
 										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
 										pbrMaterial->GetMaterialMaps()->normal->Bind(2);
 
-										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
-										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", true);
 
-										RAYER_X_ENGINE->SetShaderInt("u_DiffuseMap", RAYER_ALBEDO_SLOT);
-										RAYER_X_ENGINE->SetShaderInt("u_NormalMap", RAYER_NORMAL_SLOT);
+										RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_DiffuseMap", RAYER_ALBEDO_SLOT);
+										RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NormalMap", RAYER_NORMAL_SLOT);
 
 									}
 
@@ -225,10 +260,10 @@ namespace Rayer {
 										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
 
 
-										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
-										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", true);
 
-										RAYER_X_ENGINE->SetShaderInt("u_DiffuseMap", RAYER_ALBEDO_SLOT);
+										RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_DiffuseMap", RAYER_ALBEDO_SLOT);
 
 									}
 
@@ -238,22 +273,22 @@ namespace Rayer {
 										pbrMaterial->GetMaterialMaps()->normal->Bind(RAYER_NORMAL_SLOT);
 
 
-										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", false);
-										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", true);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", false);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", true);
 
-										RAYER_X_ENGINE->SetShaderInt("u_NormalMap", RAYER_NORMAL_SLOT);
+										RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NormalMap", RAYER_NORMAL_SLOT);
 
 									}
 
 									if (!pbrMaterial->GetTextureAvailabilityStatus().has_albedo && !pbrMaterial->GetTextureAvailabilityStatus().has_normal) {
 
-										RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
-										RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
-										RAYER_X_ENGINE->SetShaderFloat4("modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", true);
+										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", false);
+										RAYER_X_ENGINE->SetShaderFloat4(RayerXShaderType::Default, "modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
 
 									}
 
-									RAYER_X_ENGINE->SetShaderUnsignedInt("texFlags", pbrMaterial->GetAvailableTextureMaps());
+									RAYER_X_ENGINE->SetShaderUnsignedInt(RayerXShaderType::Default, "texFlags", pbrMaterial->GetAvailableTextureMaps());
 
 								}
 
@@ -261,45 +296,114 @@ namespace Rayer {
 
 							else {
 
-								RAYER_X_ENGINE->SetShaderBool("u_IsBasic", true);
-								RAYER_X_ENGINE->SetShaderBool("u_IsPBR", false);
-								RAYER_X_ENGINE->SetShaderFloat4("modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
+								RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", true);
+								RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", false);
+								RAYER_X_ENGINE->SetShaderFloat4(RayerXShaderType::Default, "modelColor", { 1.0f , 1.0f , 1.0f, 1.0f });
 
 
 							}
 
-							RAYER_X_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
-							RAYER_X_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-							RAYER_X_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+							
 
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "view", editor_camera.GetViewMatrix());
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "projection", editor_camera.GetProjectionMatrix());
+
+							//Setting directional light uniform
+							SetDirectionalLightUniform();
+							SetPointLightUniform();
+						
 							RAYER_X_ENGINE->DrawIndexed(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+
+
+							
+
 							break;
+
+						
+
+						
 						}
+
+						
+
+								
 						}
+
+						
 
 						break;
 
-					
+						
+				}
+
+				
+
+				
+			}
+		}
+
+		if (m_ViewType == ViewType::Rendered) {
+
+			// Get the iterators for the models in the scene
+			auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+			auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+			if (entityBegin != entityEnd) {
+				// Iterate over the models in the scene and draw each one
+				for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+
+					const Ref<Entity> entity = *entityIt;
+
+					if (entity->GetEntityType() == EntityType::Light) {
+
+						if (std::dynamic_pointer_cast<Light>(entity)->GetLightType() == LightType::SkyLight) {
+
+							SkyLightComponent* sklc = dynamic_cast<SkyLightComponent*>(entity->GetComponent(ComponentType::SkyLightComponent));
+
+							sklc->Activate();
+
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Skybox, "s_view", editor_camera.GetViewMatrix());
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Skybox, "s_projection", editor_camera.GetProjectionMatrix());
+							RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Skybox, "equirectangularMap", RAYER_ENVIRONMENT_MAP_SLOT);
+
+							//Drawing the skybox
+							RAYER_X_ENGINE->DrawSkybox(skyboxArray, 36);
+
+							break;
+
+						}
+
+					}
 				}
 			}
+
+			
+
 		}
 
-		auto [mx, my] = ImGui::GetMousePos();
-		mx -= m_ViewportBounds[0].x;
-		my -= m_ViewportBounds[0].y;
-		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-		my = viewportSize.y - my;
-		int mouseX = (int)mx;
-		int mouseY = (int)my;
 
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-		{
-			int pixelData = fb->ReadPixel(1, mouseX, mouseY);
+		if (enableSelection) {
+			auto [mx, my] = ImGui::GetMousePos();
+			mx -= m_ViewportBounds[0].x;
+			my -= m_ViewportBounds[0].y;
+			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+			my = viewportSize.y - my;
+			int mouseX = (int)mx;
+			int mouseY = (int)my;
 
-			if (Input::IsMouseButtonPressed(Mouse::Button0)) {
-				Scene::selectedEntityID = pixelData == -1 ? -1 : pixelData;
+			if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+			{
+				int pixelData = fb->ReadPixel(1, mouseX, mouseY);
+
+				if (Input::IsMouseButtonPressed(Mouse::Button0)) {
+					Scene::selectedEntityID = pixelData == -1 ? -1 : pixelData;
+				}
 			}
+
 		}
+
 
 		if (m_ViewportState == ViewportState::Hovered) {
 
@@ -307,6 +411,39 @@ namespace Rayer {
 			if (Input::IsKeyPressed(Key::Delete)) {
 
 				if (Scene::selectedEntityID != -1) {
+
+					// Get the iterators for the models in the scene
+					auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+					auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+					if (entityBegin != entityEnd) {
+						// Iterate over the models in the scene and draw each one
+						for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+							const Ref<Entity> entity = *entityIt;
+
+							if (entity->GetEntityID() == Scene::selectedEntityID) {
+
+								if (entity->GetEntityType() == EntityType::Light) {
+
+									auto light = std::dynamic_pointer_cast<Light>(entity);
+
+									if (light->GetLightType() == LightType::Directional && Scene::directionalLightCount != 0) {
+
+										Scene::directionalLightCount--;
+
+									}
+
+									if (light->GetLightType() == LightType::Point && Scene::pointLightCount != 0) {
+
+										Scene::pointLightCount--;
+									}
+
+								}
+							}
+						}
+
+					}
 
 					Application::Get().GetScene()->RemoveEntity(Scene::selectedEntityID);
 
@@ -576,6 +713,15 @@ namespace Rayer {
 									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, 
 									glm::value_ptr(transformation->GetTransformationMatrix()));
 								break;
+
+							case EntityType::Light:
+
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::TRANSLATE, ImGuizmo::WORLD,
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
+
 							}
 							
 							break;
@@ -590,6 +736,15 @@ namespace Rayer {
 									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::ROTATE, ImGuizmo::WORLD, 
 									glm::value_ptr(transformation->GetTransformationMatrix()));
 								break;
+
+							case EntityType::Light:
+
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::ROTATE, ImGuizmo::WORLD,
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
+
 							}
 
 							break;
@@ -604,6 +759,13 @@ namespace Rayer {
 									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::SCALE, ImGuizmo::WORLD, 
 									glm::value_ptr(transformation->GetTransformationMatrix()));
 								break;
+
+							case EntityType::Light:
+								ImGuizmo::Enable(true);
+								ImGuizmo::Manipulate(glm::value_ptr(editor_camera.GetViewMatrix()),
+									glm::value_ptr(editor_camera.GetProjectionMatrix()), ImGuizmo::SCALE, ImGuizmo::WORLD,
+									glm::value_ptr(transformation->GetTransformationMatrix()));
+								break;
 							}
 
 							break;
@@ -611,7 +773,6 @@ namespace Rayer {
 					
 
 					
-
 				}
 
 
@@ -738,9 +899,11 @@ namespace Rayer {
 		}
 
 		Ref<Entity> model = CreateRef<Model>(entityName, Scene::nextEntityID ,  EntityType::Model, filepath);
-		Scene::nextEntityID++;
+		//Scene::nextEntityID++;
 		
 		if (std::dynamic_pointer_cast<Model>(model)->IsReadSuccessful()) {
+
+			Scene::selectedEntityID = model ->GetEntityID();
 			// Adding a new model into the current scene
 			Application::Get().GetScene()->AddEntity(model);
 		}
@@ -768,6 +931,7 @@ namespace Rayer {
 
 		dispatcher.Dispatch<KeyPressedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<FileDroppedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnFileDropped));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(RAYER_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	
 
 	}
@@ -884,6 +1048,118 @@ namespace Rayer {
 		return false;
 	}
 
+
+
+	void EditorLayer::SetDirectionalLightUniform() {
+
+		// Get the iterators
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+		if (entityBegin != entityEnd) {
+			
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+			
+
+				const Ref<Entity> entity = *entityIt;
+
+				if (entity->GetEntityType() == EntityType::Light) {
+
+			
+
+					auto light = std::dynamic_pointer_cast<Light>(entity);
+
+					if (light->GetLightType() == LightType::Directional) {
+
+						
+						std::string uniformName = "u_DirectionalLights[0]";
+
+						auto Dir_light = std::dynamic_pointer_cast<DirectionalLight>(light);
+						Dir_light->CalculateDirection();
+
+
+
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".direction"), Dir_light->GetLightProperties().direction);
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".color"), Dir_light->GetLightProperties().color);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".intensity"), Dir_light->GetLightProperties().intensity);
+
+						
+
+
+					}
+
+				}
+
+				
+			}
+
+
+		}
+		RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NumDirectionalLights", Scene::directionalLightCount);
+	}
+
+
+	void EditorLayer::SetPointLightUniform() {
+
+		// Get the iterators
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+		if (entityBegin != entityEnd) {
+
+			int index = 0;
+
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+				
+				const Ref<Entity> entity = *entityIt;
+
+				if (entity->GetEntityType() == EntityType::Light) {
+
+					
+					
+
+					auto light = std::dynamic_pointer_cast<Light>(entity);
+
+					if (light->GetLightType() == LightType::Point) {
+
+						
+						std::string uniformName = "u_PointLights[" + std::to_string(index) + "]";
+
+						auto Point_light = std::dynamic_pointer_cast<PointLight>(light);
+						Point_light->CalculatePosition();
+
+
+
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".position"), Point_light->GetLightProperties().position);
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default,(uniformName + ".color"), Point_light->GetLightProperties().color);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default,(uniformName + ".intensity"), Point_light->GetLightProperties().intensity);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default,(uniformName + ".constant"), Point_light->GetLightProperties().constant);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default,(uniformName + ".linear"), Point_light->GetLightProperties().linear);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".quadratic"), Point_light->GetLightProperties().quadratic);
+
+
+						
+
+						index++;
+
+
+					}
+
+				}
+
+				
+			}
+
+			
+	}
+
+		RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NumPointLights", Scene::pointLightCount);
+
+	}
+
+
 	bool EditorLayer::OnFileDropped(FileDroppedEvent& e) {
 
 		#ifdef RAYER_DEBUG
@@ -897,6 +1173,27 @@ namespace Rayer {
 
 	}
 
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
+
+		if ((e.GetButton() == Mouse::Button0 && ImGuizmo::IsOver()) ||
+			(e.GetButton() == Mouse::Button0 && (Input::IsKeyPressed(Key::LeftAlt) || Input::IsKeyPressed(Key::RightAlt)))) {
+
+			enableSelection = false;
+			
+		}
+
+		else {
+
+			enableSelection = true;
+
+		}
+
+		return true;
+
+	}
+
+	
 	
 
 }

@@ -1,5 +1,4 @@
 
-
 #include <Rayer/Core/Assert.h>
 #include "OpenGLFrameBuffer.h"
 
@@ -76,6 +75,7 @@ namespace Rayer {
 			switch (format)
 			{
 			case FramebufferTextureFormat::DEPTH24STENCIL8:  return true;
+			case FramebufferTextureFormat::DEPTH_COMPONENT24: return true;
 			}
 
 			return false;
@@ -98,8 +98,8 @@ namespace Rayer {
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FramebufferSpecification& spec)
 		: bufferSpecification(spec)
 	{
-		bufferSpecification.Width = 1280;
-		bufferSpecification.Height = 720;
+		//bufferSpecification.Width = 1280;
+		//bufferSpecification.Height = 720;
 
 		for (auto spec : bufferSpecification.Attachments.Attachments)
 		{
@@ -145,6 +145,7 @@ namespace Rayer {
 				case FramebufferTextureFormat::RED_INTEGER:
 					Utils::AttachColorTexture(m_ColorAttachments[i], bufferSpecification.Samples, GL_R32I, GL_RED_INTEGER, bufferSpecification.Width, bufferSpecification.Height, i);
 					break;
+				
 				}
 			}
 		}
@@ -158,6 +159,10 @@ namespace Rayer {
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 				Utils::AttachDepthTexture(m_DepthAttachment, bufferSpecification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, bufferSpecification.Width, bufferSpecification.Height);
 				break;
+			case FramebufferTextureFormat::DEPTH_COMPONENT24:
+				Utils::AttachDepthTexture(m_DepthAttachment, bufferSpecification.Samples, GL_DEPTH_COMPONENT24, GL_DEPTH_ATTACHMENT, bufferSpecification.Width, bufferSpecification.Height);
+				break;
+
 			}
 		}
 
@@ -171,6 +176,14 @@ namespace Rayer {
 
 
 		}
+
+		if (m_DepthAttachment != 0) {
+
+			
+
+
+		}
+
 		else if (m_ColorAttachments.empty())
 		{
 			// Only depth-pass

@@ -8,7 +8,9 @@ namespace Rayer {
 		None = 0,
 		TransformComponent,
 		CameraComponent,
-		MaterialComponent
+		MaterialComponent,
+		SkyLightComponent,
+		LightComponent
 
 	};
 
@@ -34,8 +36,7 @@ namespace Rayer {
 
 		ComponentType type;
 
-		
-
+	
 
 	};
 

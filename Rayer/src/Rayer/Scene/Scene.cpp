@@ -2,6 +2,11 @@
 
 namespace Rayer {
 
+	int Scene::directionalLightCount = 0;
+	int Scene::pointLightCount = 0;
+	
+	Ref<Entity> Scene::directionalLight = nullptr;
+
 	std::string Scene::selectedEntityName{};
 
 	int Scene::selectedEntityID = -1;

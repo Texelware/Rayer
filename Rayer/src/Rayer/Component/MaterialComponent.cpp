@@ -1,7 +1,7 @@
 #include "MaterialComponent.h"
 #include <imgui.h>
 #include <Rayer/Filesystem/FileSystem.h>
-
+#include <Rayer/Log/Logger.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Rayer {
@@ -86,11 +86,17 @@ namespace Rayer {
 
 						fs::path _path = m_platformUtils->OpenFileDialog("*.png,*.jpg");
 
-						if (!_path.empty()) {
+						if (!_path.empty() && (_path.extension() == ".jpg" || _path.extension() == ".png")) {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
 							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo);
+
+						}
+
+						else {
+
+							LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Failed to add texture! Possible reasons: Path does not exist or file format is incorrect or not supported.") });
 
 						}
 
@@ -99,6 +105,23 @@ namespace Rayer {
 					ImGui::SameLine();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 					ImGui::Text("Albedo");
+
+					ImGui::SameLine();
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 180);
+					if (ImGui::Button("x")) {
+
+						if (std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->albedo != nullptr) {
+
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetTextureAvailabilityStatus().has_albedo = false;
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->albedo = nullptr;
+
+						}
+
+					}
+					ImGui::PopStyleColor();
+
 					ImGui::PopID();
 
 					ImGui::Separator();
@@ -111,11 +134,17 @@ namespace Rayer {
 
 						fs::path _path = m_platformUtils->OpenFileDialog("*.png,*.jpg");
 
-						if (!_path.empty()) {
+						if (!_path.empty() && (_path.extension() == ".jpg" || _path.extension() == ".png")) {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
 							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo);
+
+						}
+
+						else {
+
+							LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Failed to add texture! Possible reasons: Path does not exist or file format is incorrect or not supported.") });
 
 						}
 
@@ -126,6 +155,23 @@ namespace Rayer {
 					ImGui::SameLine();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 					ImGui::Text("Albedo");
+
+					ImGui::SameLine();
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 180);
+					if (ImGui::Button("x")) {
+
+						if (std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->albedo != nullptr) {
+
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetTextureAvailabilityStatus().has_albedo = false;
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->albedo = nullptr;
+
+						}
+
+					}
+					ImGui::PopStyleColor();
+
 					ImGui::PopID();
 					
 					ImGui::Separator();
@@ -139,7 +185,7 @@ namespace Rayer {
 
 						fs::path _path = m_platformUtils->OpenFileDialog("*.png,*.jpg");
 
-						if (!_path.empty()) {
+						if (!_path.empty() && (_path.extension() == ".jpg" || _path.extension() == ".png")) {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
@@ -151,6 +197,23 @@ namespace Rayer {
 					ImGui::SameLine();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 					ImGui::Text("Normal");
+
+					ImGui::SameLine();
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 180);
+					if (ImGui::Button("x")) {
+
+						if (std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->normal != nullptr) {
+
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetTextureAvailabilityStatus().has_normal = false;
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->normal = nullptr;
+
+						}
+
+					}
+					ImGui::PopStyleColor();
+
 					ImGui::PopID();
 
 					ImGui::Separator();
@@ -163,7 +226,7 @@ namespace Rayer {
 
 						fs::path _path = m_platformUtils->OpenFileDialog("*.png,*.jpg");
 
-						if (!_path.empty()) {
+						if (!_path.empty() && (_path.extension() == ".jpg" || _path.extension() == ".png")) {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
@@ -171,10 +234,44 @@ namespace Rayer {
 
 						}
 
+						else {
+
+							LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Failed to add texture! Possible reasons: Path does not exist or file format is incorrect or not supported.") });
+
+						}
+
 					}
+
+
+
 					ImGui::SameLine();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 					ImGui::Text("Normal");
+					
+					ImGui::SameLine();
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 180);
+					if (ImGui::Button("x")) {
+
+						if (std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->normal != nullptr) {
+							
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetTextureAvailabilityStatus().has_normal = false;
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->GetMaterialMaps()->normal = nullptr;
+
+						}
+
+						else {
+
+							LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Failed to add texture! Possible reasons: Path does not exist or file format is incorrect or not supported.") });
+
+
+						}
+
+					}
+
+					ImGui::PopStyleColor();
+
 					ImGui::PopID();
 
 					ImGui::Separator();
