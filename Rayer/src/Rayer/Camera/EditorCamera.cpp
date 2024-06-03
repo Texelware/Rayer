@@ -194,4 +194,8 @@ namespace Rayer {
 
 	}
 
+	void EditorCamera::SetPosition(const glm::vec3& position) {
+		m_Position = position;
+		UpdateView();
+	}
 }

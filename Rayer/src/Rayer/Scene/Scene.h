@@ -21,6 +21,8 @@ namespace Rayer {
 		//Light count
 		static int directionalLightCount;
 		static int pointLightCount;
+		static int spotLightCount;
+		
 
 		static int nextEntityID;
 

@@ -82,6 +82,11 @@ namespace Rayer {
 		void SetDirectionalLightUniform();
 		void SetPointLightUniform();
 
+		void SetSpotLightUniform();
+
+		void SnapCameraToObject();
+
+
 
 		//Function for drawing shadows
 		void DrawShadows();

@@ -5,6 +5,10 @@
 
 #define NUM_MAX_POINT_LIGHT 10
 
+#define NUM_MAX_SPOT_LIGHT 10
+
+
+
 
 namespace Rayer {
 

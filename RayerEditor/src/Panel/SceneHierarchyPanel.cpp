@@ -32,7 +32,8 @@ namespace Rayer {
         //Add your scene lights here
         {"Skylight" , LightType::SkyLight},
 		{"Directional Light" , LightType::Directional},
-		{"Point Light" , LightType::Point}
+		{"Point Light" , LightType::Point},
+		{"Spot Light" , LightType::Spot}
          
     }
 
@@ -72,7 +73,6 @@ namespace Rayer {
 
 
 
-
                         if (Scene::selectedEntityID != -1) {
 
                             // Get the iterators for the models in the scene
@@ -100,6 +100,11 @@ namespace Rayer {
                                             if (light->GetLightType() == LightType::Point && Scene::pointLightCount != 0) {
 
                                                 Scene::pointLightCount--;
+                                            }
+
+                                            if (light->GetLightType() == LightType::Spot && Scene::spotLightCount != 0) {
+
+                                                Scene::spotLightCount--;
                                             }
 
                                         }
@@ -349,6 +354,44 @@ namespace Rayer {
             }
 
         }
+
+        else if (type == LightType::Spot) {
+
+            if (Scene::pointLightCount < NUM_MAX_SPOT_LIGHT) {
+                
+                std::string entityName = "Spot Light";
+                auto beginIt = Application::Get().GetScene()->getEntityIteratorBeginC();
+                auto endIt = Application::Get().GetScene()->getEntityIteratorEndC();
+
+                // Check if the model name already exists
+                int count = 1;
+                std::string originalName = entityName;
+                while (std::find_if(beginIt, endIt, [&](const Ref<Entity>& entity) { return entity->GetEntityName() == entityName; }) != endIt) {
+                    entityName = originalName + "(" + std::to_string(count) + ")";
+                    count++;
+                }
+
+                Ref<Entity> light = CreateRef<SpotLight>(entityName);
+                Scene::selectedEntityID = light->GetEntityID();
+
+                // Adding a new point light into the scene
+                Application::Get().GetScene()->AddEntity(light);
+
+                Scene::spotLightCount++;
+
+
+
+            }
+
+            else {
+
+                LogManager::Get()->AddLog({ LogLevel::LOG_LEVEL_ERROR , std::string("Rayer doesn't support more than " + std::to_string(NUM_MAX_SPOT_LIGHT) + " spot lights") });
+                return;
+
+            }
+
+
+            }
 
         else {
 

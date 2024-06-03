@@ -309,9 +309,12 @@ namespace Rayer {
 							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "view", editor_camera.GetViewMatrix());
 							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "projection", editor_camera.GetProjectionMatrix());
 
-							//Setting directional light uniform
+							//Passing directional lights
 							SetDirectionalLightUniform();
+							//Passing point lights
 							SetPointLightUniform();
+							//Passing spot lights
+							SetSpotLightUniform();
 						
 							RAYER_X_ENGINE->DrawIndexed(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
 
@@ -437,6 +440,11 @@ namespace Rayer {
 									if (light->GetLightType() == LightType::Point && Scene::pointLightCount != 0) {
 
 										Scene::pointLightCount--;
+									}
+
+									if (light->GetLightType() == LightType::Spot && Scene::spotLightCount != 0) {
+
+										Scene::spotLightCount--;
 									}
 
 								}
@@ -1038,13 +1046,20 @@ namespace Rayer {
 					break;
 				}
 
+				case Key::F: {
+
+					
+					SnapCameraToObject();
+					break;
+				}
+
 			}
 			
 			return true;
 
 		}
 
-
+		
 		return false;
 	}
 
@@ -1160,6 +1175,67 @@ namespace Rayer {
 	}
 
 
+	void EditorLayer::SetSpotLightUniform() {
+
+		// Get the iterators
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+		if (entityBegin != entityEnd) {
+
+			int index = 0;
+
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+
+				const Ref<Entity> entity = *entityIt;
+
+				if (entity->GetEntityType() == EntityType::Light) {
+
+
+					auto light = std::dynamic_pointer_cast<Light>(entity);
+
+					if (light->GetLightType() == LightType::Spot) {
+
+
+						std::string uniformName = "u_SpotLights[" + std::to_string(index) + "]";
+
+						auto Spot_light = std::dynamic_pointer_cast<SpotLight>(light);
+						
+						//Do the pre calculation
+						Spot_light->CalculatePosition();
+						Spot_light->CalculateDirection();
+
+
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".position"), Spot_light->GetLightProperties().position);
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".direction"), Spot_light->GetLightProperties().direction);
+						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".color"), Spot_light->GetLightProperties().color);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".intensity"), Spot_light->GetLightProperties().intensity);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".cutOff"), Spot_light->GetLightProperties().cutOff);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".constant"), Spot_light->GetLightProperties().constant);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".linear"), Spot_light->GetLightProperties().linear);
+						RAYER_X_ENGINE->SetShaderFloat(RayerXShaderType::Default, (uniformName + ".quadratic"), Spot_light->GetLightProperties().quadratic);
+
+
+
+
+						index++;
+
+
+					}
+
+				}
+
+
+			}
+
+
+		}
+
+		RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NumSpotLights", Scene::spotLightCount);
+
+	}
+
 	bool EditorLayer::OnFileDropped(FileDroppedEvent& e) {
 
 		#ifdef RAYER_DEBUG
@@ -1193,7 +1269,44 @@ namespace Rayer {
 
 	}
 
-	
+	void EditorLayer::SnapCameraToObject() {
+
+		if (Scene::selectedEntityID != -1) {
+
+			Ref<Scene> t_Scene = Application::Get().GetScene(); 
+
+			for (auto it = t_Scene->getEntityIteratorBeginC(); it != t_Scene->getEntityIteratorEndC(); ++it) {
+
+				const Ref<Entity>& entity = *it;
+
+
+				//Checking whether the entity is selected
+				if (entity->GetEntityID() == Scene::selectedEntityID) {
+
+					TransformComponent* transform = dynamic_cast<TransformComponent*>(entity->GetComponent(ComponentType::TransformComponent));
+
+					if (transform) {
+
+						//mm = model matrix
+						glm::mat4& mm = transform->GetTransformationMatrix();
+						//Extracting model matrix from the selected entity
+						glm::vec3 pos = glm::vec3(mm[3]);
+
+						
+						//Handle camera snapping here
+						
+						
+					}
+
+				}
+
+
+
+			}
+
+		}
+
+	}
 	
 
 }

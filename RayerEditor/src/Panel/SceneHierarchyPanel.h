@@ -7,6 +7,7 @@
 #include <Rayer/Lights/SkyLight.h>
 #include <Rayer/Lights/DirectionalLight.h>
 #include <Rayer/Lights/PointLight.h>
+#include <Rayer/Lights/SpotLight.h>
 
 namespace Rayer {
 

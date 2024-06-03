@@ -4,6 +4,7 @@ namespace Rayer {
 
 	int Scene::directionalLightCount = 0;
 	int Scene::pointLightCount = 0;
+	int Scene::spotLightCount = 0;
 	
 	Ref<Entity> Scene::directionalLight = nullptr;
 

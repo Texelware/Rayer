@@ -55,6 +55,27 @@ struct PointLight {
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
 uniform int u_NumPointLights;
 
+//Spot light uniforms
+struct SpotLight {
+
+    vec3 position;
+    vec3 direction;
+    vec3 color;
+    float intensity;
+
+    float cutOff;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+#define MAX_SPOT_LIGHTS 10
+
+uniform SpotLight u_SpotLights[MAX_SPOT_LIGHTS];
+uniform int u_NumSpotLights;
+
+
 // Function to decode normal map
 vec3 decodeNormal(vec3 encodedNormal) {
     vec3 normal = encodedNormal * 2.0 - 1.0; // Convert from [0, 1] to [-1, 1]
@@ -98,6 +119,31 @@ vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPosViewSpace) {
     return diffuse + specular;
 }
 
+
+// Calculate spot light contribution
+vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPosViewSpace) {
+    vec3 lightPosViewSpace = (ViewMatrix * vec4(light.position, 1.0)).xyz;
+    vec3 lightDir = normalize(lightPosViewSpace - fragPosViewSpace);
+    float distance = length(lightPosViewSpace - fragPosViewSpace);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    vec3 spotDir = normalize((ViewMatrix * vec4(light.direction, 0.0)).xyz);
+    float theta = dot(lightDir, -spotDir);
+    float epsilon = light.cutOff;
+    float intensity = clamp((theta - epsilon) / (1.0 - epsilon), 0.0, 1.0);
+
+    float diffuseStrength = max(0.0, dot(lightDir, normal));
+    vec3 diffuse = diffuseStrength * light.color * light.intensity * attenuation * intensity;
+
+    vec3 viewDir = normalize(-fragPosViewSpace);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float specularStrength = max(0.0, dot(reflectDir, viewDir));
+    specularStrength = pow(specularStrength, 32.0); // Use appropriate shininess factor
+    vec3 specular = specularStrength * light.color * light.intensity * attenuation * intensity;
+
+    return diffuse + specular;
+}
+
 void main() {
 
     
@@ -129,10 +175,14 @@ void main() {
         lighting += calculatePointLight(u_PointLights[i], normal, fragmentPosViewSpace);
     }
 
-   
+    // Spot lights calculation
+    for (int i = 0; i < u_NumSpotLights; ++i) {
+        lighting += calculateSpotLight(u_SpotLights[i], normal, fragmentPosViewSpace);
+    }
+
 
     // Ensure lighting is not zero (fallback to ambient if no lights are present)
-    if (u_NumDirectionalLights == 0 && u_NumPointLights == 0) {
+    if (u_NumDirectionalLights == 0 && u_NumPointLights == 0 && u_NumSpotLights == 0) {
         lighting = ambientColor * 0.8;
     }
 

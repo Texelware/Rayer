@@ -46,6 +46,8 @@ namespace Rayer {
 		glm::mat4& GetViewMatrix() { return m_ViewMatrix; }
 		glm::mat4& GetProjectionMatrix() { return m_Projection; }
 
+		void SetPosition(const glm::vec3& position);
+
 	private:
 
 		void UpdateView();
