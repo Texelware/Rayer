@@ -40,14 +40,11 @@ namespace Rayer {
 		//Creating platform specific utility
 		platformUtility = PlatformUtils::Create();
 
-
-		
 	}
 
-
-	 
 	void EditorLayer::OnAttach() {
 
+		//Framebuffer for the viewport render texture
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		fbSpec.Width = 1280;
@@ -55,8 +52,13 @@ namespace Rayer {
 
 		fb = Framebuffer::Create(fbSpec);
 
+		//Framebuffer for the shadow map
+		FramebufferSpecification shadowMapFbSpec;
+		shadowMapFbSpec.Attachments = { FramebufferTextureFormat::Depth };
+		shadowMapFbSpec.Width  = 2048;
+		shadowMapFbSpec.Height = 2048;
 
-		
+		shadowMapFB = Framebuffer::Create(shadowMapFbSpec);
 
 		//Vertex Arrays
 		vArray = VertexArray::Create();
@@ -99,9 +101,79 @@ namespace Rayer {
 
 		MESH_BENCH_ENGINE->Init();
 
-
+		Ref<DirectionalLight> targetLight = nullptr;
 	
 		//MESH_BENCH_ENGINE->SetViewport(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
+		
+
+		// Get the iterators for the models in the scene
+		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
+		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+
+
+		if (Scene::directionalLightCount > 0 && m_ViewType == ViewType::Rendered) {
+
+			
+
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+
+				const Ref<Entity> entity = *entityIt;
+
+				switch (entity->GetEntityType()) {
+
+				case EntityType::Light:
+
+
+					if (std::dynamic_pointer_cast<Light>(entity)->GetLightType() == LightType::Directional) {
+
+						targetLight = std::dynamic_pointer_cast<DirectionalLight>(entity);
+
+					}
+
+					break;
+
+
+				}
+
+
+			}
+				
+			MESH_BENCH_ENGINE->SetViewport(0, 0, 2048, 2048);
+
+			shadowMapFB->Bind();
+			RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Shadow, "lightSpaceMatrix", targetLight->GetLightSpaceMatrix());
+			//Draw the scene for shadow map
+			for (auto entityIt = entityBegin; entityIt != entityEnd; ++entityIt) {
+
+				const Ref<Entity> entity = *entityIt;
+
+				switch (entity->GetEntityType()) {
+
+				case EntityType::Model:
+
+					//Setting the buffer layout
+					std::dynamic_pointer_cast<Model>(entity)->GetVertexBuffer()->SetBufferLayout(*bLayout);
+
+
+					vArray->SetVertexBuffer(std::dynamic_pointer_cast<Model>(entity)->GetVertexBuffer());
+					vArray->SetIndexBuffer(std::dynamic_pointer_cast<Model>(entity)->GetIndexBuffer());
+
+					RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+					RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "view", editor_camera.GetViewMatrix());
+					RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "projection", editor_camera.GetProjectionMatrix());
+
+					RAYER_X_ENGINE->DrawShadows(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+					
+
+					break;
+
+				}
+
+			}
+			shadowMapFB->Unbind();
+		}
+
 		MESH_BENCH_ENGINE->SetViewport(0, 0, viewportWidth, viewportHeight);
 
 		editor_camera.SetViewportSize((float)viewportWidth, (float)viewportHeight);
@@ -124,9 +196,7 @@ namespace Rayer {
 		}
 
 		
-		// Get the iterators for the models in the scene
-		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
-		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
+		
 
 		if (entityBegin != entityEnd) {
 			// Iterate over the models in the scene and draw each one
@@ -149,9 +219,7 @@ namespace Rayer {
 				}
 
 				
-
-
-				
+		
 				switch (m_ViewType) {
 
 					case ViewType::Solid:
@@ -209,9 +277,15 @@ namespace Rayer {
 
 						RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default ,"u_EID", entity->GetEntityID());
 
-
-
 						
+						if (Scene::directionalLightCount > 0) {
+
+							RAYER_X_ENGINE->SetShaderMat4(RayerXShaderType::Default, "lightSpaceMatrix", targetLight->GetLightSpaceMatrix());
+							RAYER_X_ENGINE->BindTextureToUnit(RAYER_SHADOW_MAP_SLOT, shadowMapFB->GetDepthAttachmentID());
+							RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_ShadowMap", RAYER_SHADOW_MAP_SLOT);
+
+						}
+
 						switch (entity->GetEntityType()) {
 
 						case EntityType::Model: {
@@ -244,8 +318,8 @@ namespace Rayer {
 
 									if(pbrMaterial->GetTextureAvailabilityStatus().has_albedo && pbrMaterial->GetTextureAvailabilityStatus().has_normal){
 
-										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
-										pbrMaterial->GetMaterialMaps()->normal->Bind(2);
+										pbrMaterial->GetMaterialMaps()->albedo->Bind(RAYER_ALBEDO_SLOT);
+										pbrMaterial->GetMaterialMaps()->normal->Bind(RAYER_NORMAL_SLOT);
 
 										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", false);
 										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsPBR", true);
@@ -257,7 +331,7 @@ namespace Rayer {
 
 									if (pbrMaterial->GetTextureAvailabilityStatus().has_albedo) {
 
-										pbrMaterial->GetMaterialMaps()->albedo->Bind(1);
+										pbrMaterial->GetMaterialMaps()->albedo->Bind(RAYER_ALBEDO_SLOT);
 
 
 										RAYER_X_ENGINE->SetShaderBool(RayerXShaderType::Default, "u_IsBasic", false);
@@ -1111,6 +1185,7 @@ namespace Rayer {
 
 
 		}
+
 		RAYER_X_ENGINE->SetShaderInt(RayerXShaderType::Default, "u_NumDirectionalLights", Scene::directionalLightCount);
 	}
 
@@ -1134,7 +1209,6 @@ namespace Rayer {
 
 					
 					
-
 					auto light = std::dynamic_pointer_cast<Light>(entity);
 
 					if (light->GetLightType() == LightType::Point) {
@@ -1156,7 +1230,6 @@ namespace Rayer {
 
 
 						
-
 						index++;
 
 
@@ -1205,6 +1278,7 @@ namespace Rayer {
 						//Do the pre calculation
 						Spot_light->CalculatePosition();
 						Spot_light->CalculateDirection();
+						Spot_light->CalculateSpread();
 
 
 						RAYER_X_ENGINE->SetShaderFloat3(RayerXShaderType::Default, (uniformName + ".position"), Spot_light->GetLightProperties().position);

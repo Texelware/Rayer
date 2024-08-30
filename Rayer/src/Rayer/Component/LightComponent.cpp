@@ -90,6 +90,7 @@ namespace Rayer {
 
 					glm::vec3& _color = dynamic_cast<SpotLight*>(m_Light)->GetLightProperties().color;
 					float* intensity = &dynamic_cast<SpotLight*>(m_Light)->GetLightProperties().intensity;
+					float* spread = &dynamic_cast<SpotLight*>(m_Light)->GetLightProperties().spread;
 
 
 					ImVec4 buttonColor = ImVec4(_color.x, _color.y, _color.z, 1.0);
@@ -114,6 +115,7 @@ namespace Rayer {
 					}
 
 					ImGui::DragFloat("intensity", intensity, 0.1f, 0.0f, 1.0f);
+					ImGui::DragFloat("spread", spread, 0.1f, 10.0f, 80.0f);
 
 
 				}

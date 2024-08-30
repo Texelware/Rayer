@@ -61,6 +61,7 @@ namespace Rayer {
 		//Window Property setting related methods
 		virtual void SetVSync(bool enabled) = 0;
 		virtual void SetFullScreenMode(bool fullscreen) = 0;
+		virtual void SetWindowIcon(std::string _filePath) = 0;
 
 		static std::unique_ptr<IWindow> Create(const WindowProperties& props = WindowProperties());
 		

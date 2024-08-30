@@ -34,7 +34,22 @@ namespace Rayer {
 
 	}
 
+	glm::mat4 DirectionalLight::GetLightSpaceMatrix() {
+
+		glm::mat4 lightProjection = GetProjectionMatrix(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
+
+		glm::vec3 lightPosition = glm::vec3(modelMatrix[3]);
+
+		glm::mat4 lightView = glm::lookAt(lightPosition, lightProps.direction, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+		return lightSpaceMatrix;
+
+	}
+
 	glm::mat4 DirectionalLight::GetProjectionMatrix(float left, float right, float bottom, float top, float nearPlane, float farPlane) const {
+
 		return glm::ortho(left, right, bottom, top, nearPlane, farPlane);
 	}
 

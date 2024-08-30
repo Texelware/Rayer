@@ -12,6 +12,7 @@ in vec2 textureCordinates;
 in flat int _id;
 
 in vec3 fragPosWorldSpace;
+in vec4 FragPosLightSpace;
 
 out vec4 FragColor;
 layout(location = 1) out int id;
@@ -29,6 +30,13 @@ uniform vec4 modelColor;
 // Diffuse and normal texture uniforms
 uniform sampler2D u_DiffuseMap;
 uniform sampler2D u_NormalMap;
+
+//ShadowMap texture uniform
+uniform sampler2D u_ShadowMap;
+
+
+//Conditional varibales
+uniform bool useShadowMap;
 
 // Directional light uniforms
 struct DirectionalLight {
@@ -84,6 +92,7 @@ vec3 decodeNormal(vec3 encodedNormal) {
 
 // Calculate directional light contribution
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
+    
     vec3 directionalLightDir = normalize(light.direction);
     float directionalDiffuseStrength = max(0.0, dot(directionalLightDir, normal));
     vec3 directionalDiffuse = directionalDiffuseStrength * light.color * light.intensity;
@@ -144,6 +153,24 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPosViewSpace) {
     return diffuse + specular;
 }
 
+
+float ShadowCalc() {
+
+    vec3 pos = FragPosLightSpace.xyz * 0.5 + 0.5;
+
+    if(pos.z > 1) {
+        pos.z = 1;
+    }
+
+    float depth = texture(u_ShadowMap, pos.xy).r;
+
+    float bias = 0.05f;
+    //return depth < pos.z ? 0.0 : 1.0;
+
+    return (depth + bias) < pos.z ? 0.0 : 1.0;
+
+}
+
 void main() {
 
     
@@ -188,16 +215,55 @@ void main() {
 
     vec3 color;
     if (u_IsBasic) {
-        // Use model color directly if basic material
-        color = vec3(modelColor) * lighting;
-    } else if (u_IsPBR) {
-        if ((texFlags & AlbedoMap) != NoTextureMaps) {
-            vec4 texColor = texture(u_DiffuseMap, textureCordinates);
-            color = vec3(texColor) * lighting;
-        } else {
-            // Use model color if no AlbedoMap is used
+
+        if(u_NumDirectionalLights > 0) {
+
+            float shadow = ShadowCalc();
+            color = shadow * vec3(modelColor) * lighting;
+        }
+
+        else {
+            // Use model color directly if basic material
             color = vec3(modelColor) * lighting;
         }
+
+
+    } else if (u_IsPBR) {
+
+
+
+        if ((texFlags & AlbedoMap) != NoTextureMaps) {
+
+            if(u_NumDirectionalLights > 0) {
+
+                float shadow = ShadowCalc();
+
+                vec4 texColor = shadow * texture(u_DiffuseMap, textureCordinates);
+                color = vec3(texColor) * lighting;
+
+            }
+
+            else {
+                vec4 texColor = texture(u_DiffuseMap, textureCordinates);
+                color = vec3(texColor) * lighting;
+            }
+        } else {
+
+            if(u_NumDirectionalLights > 0) {
+
+                float shadow = ShadowCalc();
+                color = shadow * vec3(modelColor) * lighting;
+
+            }
+
+            else {
+                
+                // Use model color if no AlbedoMap is used
+                color = vec3(modelColor) * lighting;
+            }
+        }
+
+
     }
 
     // Output final color

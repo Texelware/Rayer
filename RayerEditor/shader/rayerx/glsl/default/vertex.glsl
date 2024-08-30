@@ -13,12 +13,16 @@ out vec3 Normal;
 out mat4 ViewMatrix;
 out vec2 textureCordinates;
 out vec3 fragPosWorldSpace;
+out vec4 FragPosLightSpace;
 
 //Uniforms
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+
+//Uniform for the lightSpaceMatrix
+uniform mat4 lightSpaceMatrix;
 
 
 void main() {
@@ -34,12 +38,12 @@ void main() {
     // Transform vertex normal to world space
     Normal = mat3(transpose(inverse(model))) * vertexNormal;
 
+    FragPosLightSpace = lightSpaceMatrix * vec4(fragPosWorldSpace, 1.0);
+
     // Calculate final position
     gl_Position = projection * view * model * vec4(vertexPosition , 1.0);
 
- 
-
-
+    
     _id = u_EID;
    
 }

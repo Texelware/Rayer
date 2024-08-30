@@ -27,9 +27,9 @@ namespace Rayer {
 		// Method to get the light's projection matrix for shadow mapping
 		glm::mat4 GetProjectionMatrix(float left, float right, float bottom, float top, float nearPlane, float farPlane) const;
 
+		glm::mat4 GetLightSpaceMatrix();
 
 		
-
 	private:
 
 		glm::mat4 modelMatrix { 1 };

@@ -12,7 +12,6 @@ namespace Rayer {
 		m_ShaderSkybox = Shader::Create("shader/rayerx/glsl/skybox/vertex.glsl", "shader/rayerx/glsl/skybox/fragment.glsl");
 		m_ShaderShadow = Shader::Create("shader/rayerx/glsl/shadow/vertex.glsl", "shader/rayerx/glsl/shadow/fragment.glsl");
 
-
 	}
 
 	void RayerX::Init() {

@@ -1,4 +1,3 @@
-
 #include <Rayer/Core/Assert.h>
 #include "OpenGLFrameBuffer.h"
 
@@ -179,7 +178,7 @@ namespace Rayer {
 
 		if (m_DepthAttachment != 0) {
 
-			
+			glDrawBuffer(m_DepthAttachment);
 
 
 		}
@@ -225,7 +224,7 @@ namespace Rayer {
 	{
 		RAYER_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "Not a valid index")
 
-			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 		int pixelData;
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 		return pixelData;

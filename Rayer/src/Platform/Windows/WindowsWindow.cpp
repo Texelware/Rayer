@@ -1,5 +1,6 @@
 #include "WindowsWindow.h"
-
+#include <stb_image.h>
+#include <filesystem>
 
 namespace Rayer {
 
@@ -47,6 +48,7 @@ namespace Rayer {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+		
 
 		//Creating actual window for windows
 		m_Window = glfwCreateWindow(m_WindowData.w_Width, m_WindowData.w_Height, m_WindowData.w_Title.c_str(), nullptr, nullptr);
@@ -60,6 +62,9 @@ namespace Rayer {
 
 		//Setting VSync
 		SetVSync(m_WindowData.w_VSync);
+
+		//Setting window icon
+		SetWindowIcon((std::filesystem::current_path()).string() + "/assets/logo/Rayer-Logo.png");
 
 		//------------------------Callbacks------------------------
 
@@ -96,8 +101,8 @@ namespace Rayer {
 				}
 				}
 			});
-
-		
+			
+			
 
 			glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
 			{
@@ -218,7 +223,31 @@ namespace Rayer {
 
 	}
 
+	void WindowsWindow::SetWindowIcon(std::string _filePath) {
 
+		// Load the icon image using stb_image
+		int width, height, channels;
+		unsigned char* pixels = stbi_load(_filePath.c_str(), &width, &height, &channels, 4);  // 4 = RGBA
+
+		if (pixels) {
+			// Create a GLFWimage and set its properties
+			GLFWimage icon;
+			icon.width = width;
+			icon.height = height;
+			icon.pixels = pixels;
+
+			// Set the window icon
+			glfwSetWindowIcon(m_Window, 1, &icon);
+
+			// Free the image memory
+			stbi_image_free(pixels);
+		}
+		else {
+			// Handle error
+			fprintf(stderr, "Failed to load icon image\n");
+		}
+
+	}
 
 
 	

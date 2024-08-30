@@ -11,6 +11,7 @@ namespace Rayer {
         glm::vec3 direction;
         glm::vec3 color;
         float intensity;
+        float spread;
 
         float cutOff;
 
@@ -32,6 +33,8 @@ namespace Rayer {
 
 		void CalculateDirection();
 
+        void CalculateSpread();
+
     private:
 
         glm::mat4 modelMatrix{ 1 };
@@ -44,8 +47,11 @@ namespace Rayer {
             {1.0f , 1.0f , 1.0f}, // color
             1.0f,                 // intensity
 
+            //Default spread
+            20.0f,
+
             // Cutoff angle
-            glm::cos(glm::radians(20.0f)),  // cutOff
+            glm::cos(glm::radians(lightProps.spread)),  // cutOff
 
             // Attenuation factors
             1.0f,   // constant

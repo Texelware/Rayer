@@ -33,4 +33,9 @@ namespace Rayer {
 		lightProps.direction = rotationMatrix * defaultDirection;
 	}
 
+	void SpotLight::CalculateSpread() {
+
+		lightProps.cutOff = glm::cos(glm::radians(lightProps.spread));
+
+	}
 }

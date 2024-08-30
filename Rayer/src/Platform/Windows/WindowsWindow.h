@@ -38,6 +38,8 @@ namespace Rayer {
 		virtual void* GetNativeWindow() override;
 		virtual void SetFullScreenMode(bool fullscrenn) override;
 
+		virtual void SetWindowIcon(std::string _filePath) override;
+
 		virtual void SetEventCallback(const EventCallbackFn& callback) override;
 	
 

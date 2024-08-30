@@ -134,6 +134,9 @@ namespace Rayer {
 		//Framebuffer for viewport
 		Ref<Framebuffer> fb;
 
+		//Framebuffer for shadow map
+		Ref<Framebuffer> shadowMapFB;
+
 		
 
 		Scope<PlatformUtils> platformUtility;

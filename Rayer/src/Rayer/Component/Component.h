@@ -36,8 +36,7 @@ namespace Rayer {
 
 		ComponentType type;
 
-	
-
+	 
 	};
 
 }
