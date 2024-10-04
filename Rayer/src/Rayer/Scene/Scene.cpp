@@ -5,6 +5,17 @@ namespace Rayer {
 	int Scene::directionalLightCount = 0;
 	int Scene::pointLightCount = 0;
 	int Scene::spotLightCount = 0;
+
+	Scene::Scene() {
+
+		
+
+		sceneSerializer = std::make_unique<SceneSerializer>(this);
+
+
+	}
+
+	
 	
 	Ref<Entity> Scene::directionalLight = nullptr;
 
@@ -36,6 +47,27 @@ namespace Rayer {
 			}
 
 		}
+
+	}
+
+	void Scene::ClearScene() {
+
+		//clear all entities
+		m_Entities.clear();
+
+		//make the next entity id to 0
+		nextEntityID = 0;
+
+		//reset selected entity id and name
+		selectedEntityID = -1;
+		selectedEntityName.clear();
+
+		//reset directional light
+		directionalLight = nullptr;
+
+		directionalLightCount = 0;
+		pointLightCount = 0;
+		spotLightCount = 0;
 
 	}
 

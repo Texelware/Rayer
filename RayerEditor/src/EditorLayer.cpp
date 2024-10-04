@@ -106,7 +106,7 @@ namespace Rayer {
 		//MESH_BENCH_ENGINE->SetViewport(viewportPositionX, viewportPositionY, viewportWidth, viewportHeight);
 		
 
-		// Get the iterators for the models in the scene
+		// Get the iterators for the entities in the scene
 		auto entityBegin = Application::Get().GetScene()->getEntityIteratorBeginC();
 		auto entityEnd = Application::Get().GetScene()->getEntityIteratorEndC();
 
@@ -235,7 +235,11 @@ namespace Rayer {
 								MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
 								MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
 
+								MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+
 								MESH_BENCH_ENGINE->DrawIndexed(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
+
+
 
 								break;
 						}
@@ -251,6 +255,12 @@ namespace Rayer {
 						switch (entity->GetEntityType()) {
 
 						case EntityType::Model:
+							
+
+							MESH_BENCH_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
+							MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
+							MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+
 							//Rndering green wireframe to the selected object in wireframe view
 							if (entity->GetEntityID() == Scene::selectedEntityID) {
 
@@ -258,13 +268,15 @@ namespace Rayer {
 
 							}
 
-							MESH_BENCH_ENGINE->SetShaderMat4("model", std::dynamic_pointer_cast<Model>(entity)->GetModelMatrix());
-							MESH_BENCH_ENGINE->SetShaderMat4("view", editor_camera.GetViewMatrix());
-							MESH_BENCH_ENGINE->SetShaderMat4("projection", editor_camera.GetProjectionMatrix());
+							else {
+
+								MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+
+							}
 
 							MESH_BENCH_ENGINE->DrawWireframe(vArray, std::dynamic_pointer_cast<Model>(entity)->GetTotalIndexCount());
 
-							MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
+							//MESH_BENCH_ENGINE->SetShaderFloat3("modelColor", { 1.0, 1.0, 1.0 });
 
 							break;
 						}
@@ -616,6 +628,11 @@ namespace Rayer {
 
 			if (ImGui::MenuItem("Save", "Ctrl+S")) {
 
+				FILEPATH filepath = platformUtility->SaveFile(".rayer" , "rayer");
+
+				SaveProject(filepath);
+
+
 			}
 
 			if (ImGui::MenuItem("Save as..")) {
@@ -878,19 +895,44 @@ namespace Rayer {
 
 				if (ImGui::Button("OK", ImVec2(120, 0))) {
 
-					//TODO : Implement saving changes logic
-					/**********/
-					/**********/
-					/**********/
-					/**********/
-					/**********/
+					
 
 					m_ProjectOpen = false;
 					FILEPATH filepath = platformUtility->OpenFileDialog(".rayer");
 
 					if (!filepath.empty())
 					{
-						OpenProject(filepath);
+						if (Application::Get().GetScene()->getSceneSerializeState() == SerializeState::NotSerialized) {
+
+							FILEPATH saveFilepath = platformUtility->OpenFileDialog(".rayer");
+
+							if (!saveFilepath.empty()) {
+
+								Application::Get().GetScene()->getSerializer()->Serialize(saveFilepath);
+
+							}
+
+							OpenProject(filepath);
+							
+
+						}
+
+						if (Application::Get().GetScene()->getSceneSerializeState() == SerializeState::Serialized) {
+
+
+							Application::Get().GetScene()->getSerializer()->Serialize(
+								Application::Get().GetScene()->getSerializedPath());
+
+							FILEPATH openFilepath = platformUtility->OpenFileDialog(".rayer");
+
+							if (!openFilepath.empty()) {
+
+								OpenProject(openFilepath);
+
+							}
+
+						}
+						
 					}
 
 					ImGui::CloseCurrentPopup();
@@ -903,7 +945,9 @@ namespace Rayer {
 
 					if (!filepath.empty())
 					{
+						
 						OpenProject(filepath);
+						
 					}
 				}
 
@@ -949,7 +993,19 @@ namespace Rayer {
 			return;
 		}
 
-		//TODO: Load project from file
+		//TODO: Implement scene deserialization
+
+		scene->getSerializer()->Deserialize(filepath);
+		
+
+	}
+
+
+	void EditorLayer::SaveProject(FILEPATH& filepath, Ref<Scene> scene) {
+
+		
+
+		scene->getSerializer()->Serialize(filepath);
 
 	}
 

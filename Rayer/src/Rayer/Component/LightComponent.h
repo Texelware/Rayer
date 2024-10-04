@@ -16,6 +16,9 @@ namespace Rayer {
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
 
+		LightType& GetLightType()  { return m_LightType; }
+		Light* GetLight() { return m_Light; }
+
 
 	private:
 

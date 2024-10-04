@@ -37,4 +37,49 @@ namespace Rayer {
 
 	}
 
+    std::filesystem::path WindowsUtils::SaveFile(const char* filter, const char* extension)
+    {
+        OPENFILENAMEA ofn;
+        CHAR szFile[260] = { 0 };  // Buffer to store the file name
+        CHAR currentDir[256] = { 0 };  // Buffer to store the current directory
+
+        ZeroMemory(&ofn, sizeof(OPENFILENAMEA));  // Clear the structure
+
+        ofn.lStructSize = sizeof(OPENFILENAMEA);  // Set structure size
+        ofn.hwndOwner = NULL;  // No owner window required
+
+        ofn.lpstrFile = szFile;  // Pointer to the file buffer
+        ofn.nMaxFile = sizeof(szFile);  // Max file buffer size
+
+        if (GetCurrentDirectoryA(256, currentDir))  // Get current directory
+            ofn.lpstrInitialDir = currentDir;  // Set it as the initial directory
+
+        // Use the provided filter (e.g., "Rayer Files\0*.rayer\0All Files\0*.*\0")
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;  // Default filter index
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
+
+        // Set the provided extension (e.g., "rayer", without the dot)
+        ofn.lpstrDefExt = extension;
+
+        // Show the Save As dialog
+        if (GetSaveFileNameA(&ofn) == TRUE) {
+            std::string filePath = ofn.lpstrFile;
+
+            // Ensure the file ends with the provided extension
+            std::string extWithDot = std::string(".") + extension;
+            if (filePath.find(extWithDot) == std::string::npos) {
+                filePath += extWithDot;  // Append the extension if it's missing
+            }
+
+            // Return the file path with the extension
+            return std::filesystem::path(filePath);
+        }
+
+        // If canceled or failed, return an empty path
+        return std::filesystem::path();
+    }
+
+
+
 }

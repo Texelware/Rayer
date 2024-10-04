@@ -21,7 +21,8 @@ project "Rayer"
         "vendor/ImGui/include",
         "vendor/stb_image/include",
         "vendor/assimp/include",
-        "vendor/glm"
+        "vendor/glm",
+        "vendor/toml++/include"
 
     }
 

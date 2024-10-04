@@ -1,3 +1,6 @@
 [submodule "Rayer/vendor/glm"]
 	path = Rayer/vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "Rayer/vendor/toml++"]
+	path = Rayer/vendor/toml++
+	url = https://github.com/marzer/tomlplusplus.git

@@ -64,6 +64,7 @@ namespace Rayer {
 		virtual void OnImGuiRender() override;
 
 		void OpenProject(FILEPATH& filepath, Ref<Scene> scene = Application::Get().GetScene());
+		void SaveProject(FILEPATH& filepath, Ref<Scene> scene = Application::Get().GetScene());
 
 		void AddNewModel(FILEPATH& filepath, const std::string& extension);
 

@@ -15,6 +15,8 @@ namespace Rayer {
 	public:
 
 		MaterialComponent();
+		MaterialComponent(Ref<Material> material);
+		
 
 		virtual void OnRender() override;
 		virtual void OnUpdate() override;

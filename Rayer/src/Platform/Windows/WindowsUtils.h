@@ -9,6 +9,7 @@ namespace Rayer {
 		public:
 
 			virtual std::filesystem::path OpenFileDialog(const std::string filter) override;
+			virtual std::filesystem::path SaveFile(const char* filter , const char* extension) override;
 
 	};
 

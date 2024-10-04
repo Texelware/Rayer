@@ -24,6 +24,22 @@ namespace Rayer {
 		
 	}
 
+	MaterialComponent::MaterialComponent(Ref<Material> material) : Component(ComponentType::MaterialComponent) {
+
+		m_platformUtils = PlatformUtils::Create();
+
+
+		std::string absolute_path = RayerFileSystem::_currentWorkingPath.string() + "/assets/textures/checkerboard.png";
+
+
+		checkerboard_texture = Texture2D::Create(absolute_path);
+
+		m_material = material;
+
+
+
+	}
+
 
 	void MaterialComponent::OnRender() {
 
@@ -90,7 +106,7 @@ namespace Rayer {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
-							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo);
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo , _path);
 
 						}
 
@@ -138,7 +154,7 @@ namespace Rayer {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
-							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo);
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Albedo, _path);
 
 						}
 
@@ -189,7 +205,7 @@ namespace Rayer {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
-							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Normal);
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Normal , _path);
 
 						}
 
@@ -230,7 +246,7 @@ namespace Rayer {
 
 							Ref<Texture2D> _texture = Texture2D::Create(_path);
 
-							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Normal);
+							std::dynamic_pointer_cast<PBR_Material>(m_material)->Update(_texture, MapType::Normal , _path);
 
 						}
 

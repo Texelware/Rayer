@@ -12,6 +12,13 @@ namespace Rayer {
 
 	};
 
+	struct TexturePaths {
+
+		std::filesystem::path albedo_path{};
+		std::filesystem::path normal_path{};
+
+	};
+
 	enum class MapType {
 
 		None = 0,
@@ -43,10 +50,11 @@ namespace Rayer {
 
 		virtual void Reset() override;
 
-		void Update(Ref<Texture2D>& _map, const MapType _type);
+		void Update(Ref<Texture2D>& _map, const MapType _type , std::filesystem::path filepath);
 
 		Ref<MaterialMaps>& GetMaterialMaps() { return m_Maps; }
 		TextureAvailabilityStatus& GetTextureAvailabilityStatus() { return m_textureAvailabilityStatus; }
+		TexturePaths& GetTexturePaths() { return m_texturePaths; }
 
 		uint32_t GetAvailableTextureMaps() { return m_availableTextureMaps; }
 
@@ -55,6 +63,8 @@ namespace Rayer {
 		Ref<MaterialMaps> m_Maps;
 
 		TextureAvailabilityStatus m_textureAvailabilityStatus;
+
+		TexturePaths m_texturePaths;
 
 		uint32_t m_availableTextureMaps{ NoTextureMaps };
 	};

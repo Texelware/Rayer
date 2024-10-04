@@ -15,6 +15,7 @@ namespace Rayer {
 		virtual void Reset() override;
 
 		glm::vec4& GetColor() { return _color; }
+		void SetColor(const glm::vec4& color) { _color = color; }
 
 	private:
 

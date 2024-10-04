@@ -4,8 +4,9 @@
 
 namespace Rayer {
 
-	Model::Model(const std::string& _name ,const int id, const EntityType type ,const std::filesystem::path& filepath) : Entity(_name, id , type) {
+	Model::Model(const std::string& _name ,const int id, const EntityType type ,const std::filesystem::path& filepath) : Entity(_name, id , type)  {
 
+        model_path = std::filesystem::path(filepath);
 		LoadModel(filepath);
 
         // Convert vertices to a flat array of floats

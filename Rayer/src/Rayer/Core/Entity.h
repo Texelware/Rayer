@@ -5,6 +5,7 @@
 #include <Rayer/Component/Component.h>
 
 
+
 namespace Rayer {
 
 	enum class EntityType {
@@ -111,6 +112,7 @@ namespace Rayer {
 		EntityType type;
 
 		int id;
+
 
 		std::vector <Component*> components{};
 	};

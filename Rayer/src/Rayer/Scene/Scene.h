@@ -3,14 +3,23 @@
 #include <rpch.h>
 #include <Rayer/Core/Core.h>
 #include <Rayer/Core/Entity.h>
+#include "SceneSerializer.h"
 
 
 namespace Rayer {
 
 
+	enum SerializeState {
+
+		Serialized,
+		NotSerialized
+	};
+
 	class Scene {
 
 	public:
+
+		Scene();
 
 		static std::string selectedEntityName;
 		static int selectedEntityID;
@@ -40,14 +49,38 @@ namespace Rayer {
 		const_interator<Entity> getEntityIteratorBeginC() const { return m_Entities.begin(); }
 		const_interator<Entity> getEntityIteratorEndC() const { return m_Entities.end(); }
 
+		SceneSerializer* getSerializer() { 
 
+			return sceneSerializer.get(); 
+		}
+
+		SerializeState getSceneSerializeState() { return serializeState; }
+		
+		void setSceneSerializeState(const SerializeState state) {
+
+			serializeState = state;
+
+		}
+
+		std::filesystem::path& getSerializedPath() { return serializedPath; }
+		void setSerializedPath(const std::filesystem::path& path) { serializedPath = path; }
 
 		void AddEntity(Ref<Entity>& entity);
 		void RemoveEntity(int entityID);
 
-	private:
+		void ClearScene();
 
+
+	private:
+		
 		std::vector<Ref<Entity>> m_Entities {};
+
+		//SceneSerializer for serialization and deserialization
+		std::unique_ptr<SceneSerializer> sceneSerializer = nullptr;
+
+		SerializeState serializeState { NotSerialized };
+
+		std::filesystem::path serializedPath {};
 
 	};
 

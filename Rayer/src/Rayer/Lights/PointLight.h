@@ -17,7 +17,7 @@ namespace Rayer {
     };
 
 
-	class PointLight : public Light {
+    class PointLight : public Light {
 
     public:
 
@@ -33,18 +33,18 @@ namespace Rayer {
 
         PointLightProps lightProps{
             
-			//Main properties of the light
+            //Main properties of the light
             {1.0f , 1.0f, 1.0f},
             {1.0f , 1.0f , 1.0f},
             1.0f,
 
-			//Those are only for point light calculations
+            //Those are only for point light calculations
             1.0f,
             0.09f,
             0.032f
 
         };
 
-	};
+    };
 
 }

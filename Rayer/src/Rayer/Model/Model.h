@@ -53,7 +53,12 @@ namespace Rayer {
 		Ref<IndexBuffer>& GetIndexBuffer() { return indexBuffer; }
 
 		glm::mat4& GetModelMatrix() { return modelMatrix; }
+
+
 		uint32_t GetTotalIndexCount() const;
+
+		const std::filesystem::path& GetModelPath() { return model_path; }
+
 
 	private:
 
@@ -69,6 +74,7 @@ namespace Rayer {
 		Ref<VertexBuffer> vertexBuffer;
 		Ref<IndexBuffer> indexBuffer;
 
+		std::filesystem::path model_path;
 		
 
 		////////////////////////////////////////////////

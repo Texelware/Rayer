@@ -21,7 +21,7 @@ namespace Rayer {
 
 	}
 
-	void PBR_Material::Update(Ref<Texture2D>& _map, const MapType _type) {
+	void PBR_Material::Update(Ref<Texture2D>& _map, const MapType _type , std::filesystem::path filepath) {
 
 		switch (_type) {
 
@@ -29,6 +29,8 @@ namespace Rayer {
 
 				m_Maps->albedo = std::move(_map);
 				m_textureAvailabilityStatus.has_albedo = true;
+				m_texturePaths.albedo_path = std::move(filepath);
+
 
 				break;
 
@@ -36,6 +38,7 @@ namespace Rayer {
 
 				m_Maps->normal = std::move(_map);
 				m_textureAvailabilityStatus.has_normal = true;
+				m_texturePaths.normal_path = std::move(filepath);
 
 				break;
 		}

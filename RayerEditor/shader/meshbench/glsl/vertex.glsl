@@ -6,7 +6,8 @@ layout (location = 2) in vec2 textCords;
 
 //Output variables
 out vec3 Normal;
-out mat4 ViewMatrix;
+
+//out mat4 ViewMatrix;
 flat out int _id;
 
 uniform int u_EID;
@@ -15,11 +16,11 @@ uniform int u_EID;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 modelColor;
 
 void main() {
     
-    ViewMatrix = view;
-  
+ 
 
     // Transform vertex normal to world space
     Normal = mat3(transpose(inverse(model))) * vertexNormal;
