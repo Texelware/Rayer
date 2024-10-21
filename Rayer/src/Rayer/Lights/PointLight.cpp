@@ -7,7 +7,7 @@
 namespace Rayer {
 
 
-	PointLight::PointLight(const std::string& name) : Light(LightType::Point, name) {
+	PointLight::PointLight(const std::string& name , const int entity_id) : Light(LightType::Point, name , entity_id) {
 	
 		AddComponent(new TransformComponent(modelMatrix));
 		AddComponent(new LightComponent(this));

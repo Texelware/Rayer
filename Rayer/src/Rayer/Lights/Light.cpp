@@ -4,7 +4,7 @@
 namespace Rayer {
 
 
-	Light::Light(LightType type, std::string name) : Entity(name, Scene::nextEntityID, EntityType::Light), m_type{type} {}
+	Light::Light(LightType type, std::string name , const int entity_id) : Entity(name, entity_id, EntityType::Light), m_type{type} {}
 
 
 }

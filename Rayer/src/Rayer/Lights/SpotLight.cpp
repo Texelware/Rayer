@@ -7,7 +7,7 @@
 
 namespace Rayer {
 
-	SpotLight::SpotLight(const std::string& name) : Light(LightType::Spot , name) {
+	SpotLight::SpotLight(const std::string& name , const int entity_id) : Light(LightType::Spot , name , entity_id) {
 		
 		//Adding components
 		AddComponent(new TransformComponent(modelMatrix));

@@ -9,7 +9,7 @@ namespace Rayer {
 
 	public:
 
-		SkyLight(std::string name);
+		SkyLight(std::string name , const int entity_id);
 
 	private:
 

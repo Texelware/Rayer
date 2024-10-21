@@ -24,20 +24,26 @@ namespace Rayer {
 
         transformationMatrix = glm::mat4(1);
 
-        // Applying the rotations
-        glm::vec3 rotationRadians = glm::radians(rotation);
-        transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.x, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis rotation
+        //// Applying the rotations
+        //glm::vec3 rotationRadians = glm::radians(rotation);
+        //transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.x, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis rotation
+        //transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis rotation
+        //transformationMatrix = glm::rotate(transformationMatrix, rotationRadians.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis rotation
 
         // Applying scaling
         transformationMatrix = glm::scale(transformationMatrix, scale);
 
+        // Applying rotation using the quaternion
+        transformationMatrix *= glm::mat4_cast(rotationInQuat); // Rotate before translation
+
         // Applying translation
         transformationMatrix = glm::translate(transformationMatrix, translate);
 
+       
+
         modelMatrix = transformationMatrix;
     }
+
 
 
 	void TransformComponent::OnRender() {

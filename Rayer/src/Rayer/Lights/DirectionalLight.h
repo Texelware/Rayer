@@ -18,7 +18,7 @@ namespace Rayer {
 
 	public:
 
-		DirectionalLight(const std::string& name);
+		DirectionalLight(const std::string& name , const int entity_id);
 
 		void CalculateDirection();
 
@@ -28,7 +28,10 @@ namespace Rayer {
 		glm::mat4 GetProjectionMatrix(float left, float right, float bottom, float top, float nearPlane, float farPlane) const;
 
 		glm::mat4 GetLightSpaceMatrix();
-
+		
+		// Setter methods for color and intensity
+		void SetColor(const glm::vec3& color) { lightProps.color = color; }
+		void SetIntensity(float intensity) { lightProps.intensity = intensity; }
 		
 	private:
 

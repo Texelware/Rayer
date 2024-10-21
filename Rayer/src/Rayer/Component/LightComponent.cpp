@@ -5,7 +5,10 @@
 
 namespace Rayer {
 
-	LightComponent::LightComponent(Light* light) : m_Light(light), m_LightType(light->GetLightType()) {}
+	LightComponent::LightComponent(Light* light) : Component(ComponentType::LightComponent) ,  m_Light(light), m_LightType(light->GetLightType()) {
+		
+
+	}
 
 	void LightComponent::OnUpdate() {
 		

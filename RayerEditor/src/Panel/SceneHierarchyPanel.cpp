@@ -265,7 +265,7 @@ namespace Rayer {
 
             }
 
-            Ref<Entity> skylight = CreateRef<SkyLight>("Skylight");
+            Ref<Entity> skylight = CreateRef<SkyLight>("Skylight" , Scene::nextEntityID);
 
 			
             Scene::selectedEntityID = skylight->GetEntityID();
@@ -292,7 +292,7 @@ namespace Rayer {
                     count++;
                 }
 
-                Ref<Entity> light = CreateRef<PointLight>(entityName);
+                Ref<Entity> light = CreateRef<PointLight>(entityName , Scene::nextEntityID);
                 Scene::selectedEntityID = light->GetEntityID();
 
                 // Adding a new point light into the scene
@@ -331,11 +331,11 @@ namespace Rayer {
                     count++;
                 }
 
-                Ref<Entity> light = CreateRef<DirectionalLight>(entityName);
+                Ref<Entity> light = CreateRef<DirectionalLight>(entityName , Scene::nextEntityID);
 
                 Scene::directionalLight = light;
                 Scene::selectedEntityID = light->GetEntityID();
-                // Adding a new point light into the scene
+                // Adding a new directional light into the scene
                 Application::Get().GetScene()->AddEntity(light);
 
 
@@ -371,7 +371,7 @@ namespace Rayer {
                     count++;
                 }
 
-                Ref<Entity> light = CreateRef<SpotLight>(entityName);
+                Ref<Entity> light = CreateRef<SpotLight>(entityName , Scene::nextEntityID);
                 Scene::selectedEntityID = light->GetEntityID();
 
                 // Adding a new point light into the scene

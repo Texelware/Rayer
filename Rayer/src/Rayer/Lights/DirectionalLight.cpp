@@ -9,7 +9,7 @@
 
 namespace Rayer {
 
-	DirectionalLight::DirectionalLight(const std::string& name) : Light(LightType::Directional, name) {
+	DirectionalLight::DirectionalLight(const std::string& name , const int entity_id) : Light(LightType::Directional, name , entity_id) {
 	
 		AddComponent(new TransformComponent(modelMatrix));
 		AddComponent(new LightComponent(this));

@@ -25,7 +25,7 @@ namespace Rayer {
 
     public:
 
-        SpotLight(const std::string& name);
+        SpotLight(const std::string& name , const int entity_id);
 
         SpotLightProps& GetLightProperties() { return lightProps; }
 
@@ -34,6 +34,9 @@ namespace Rayer {
 		void CalculateDirection();
 
         void CalculateSpread();
+
+        void SetIntensity(float intensity) { lightProps.intensity = intensity; }
+        void SetColor(const glm::vec3& color) { lightProps.color = color; }
 
     private:
 

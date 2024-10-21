@@ -53,9 +53,7 @@ namespace Rayer {
 	void RayerX::DrawSkybox(const Ref<VertexArray>& vertexArray, uint32_t count) {
 
 		m_ShaderSkybox->Bind();
-
 		s_RendererApi->DrawSkybox(vertexArray, count);
-		
 		m_ShaderSkybox->Unbind();
 
 	}

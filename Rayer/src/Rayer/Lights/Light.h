@@ -27,7 +27,7 @@ namespace Rayer {
 
 	public:
 
-		Light(LightType type , std::string name );
+		Light(LightType type , std::string name , const int entity_id );
 
 		LightType GetLightType() const { return m_type; }
 

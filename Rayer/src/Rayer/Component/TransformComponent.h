@@ -2,8 +2,12 @@
 
 #include <Rayer/Component/Component.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+
 
 
 namespace Rayer {
@@ -38,7 +42,18 @@ namespace Rayer {
 
 		}
 
+		glm::quat GetRotationInQuat() {
 
+			glm::vec3 scale, translation, skew;
+			glm::vec4 perspective;
+			glm::quat rotationQuat;
+
+			// Decompose the model matrix to get the rotation quaternion
+			glm::decompose(modelMatrix, scale, rotationQuat, translation, skew, perspective);
+
+			return rotationQuat;
+
+		}
 
 		//-------------Setter Methods------------------
 
@@ -53,6 +68,13 @@ namespace Rayer {
 
 		}
 
+		void SetRotationQuat(const glm::quat& rotationQuat) {
+
+			rotationInQuat = rotationQuat;
+
+
+		}
+
 
 
 	private:
@@ -61,6 +83,7 @@ namespace Rayer {
 
 		glm::vec3 translate;
 		glm::vec3 rotation{ 0.0f , 0.0f , 0.0f};
+		glm::quat rotationInQuat = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 		glm::vec3 scale;
 
 		

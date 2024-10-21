@@ -25,7 +25,7 @@ namespace Rayer {
 		template <typename T>
 		using const_iterator = std::vector<T>::const_iterator;
 
-		Entity() = default;
+		Entity() = delete;
 		Entity(const std::string& _name, int _id , EntityType _type);
 
 		virtual ~Entity() {

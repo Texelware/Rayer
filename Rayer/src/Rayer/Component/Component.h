@@ -14,13 +14,12 @@ namespace Rayer {
 
 	};
 
+
 	class Component {
 
 	public:
 
-		
-
-		Component() = default;
+		Component() = delete;
 		Component(ComponentType _type) : type(_type) {}
 
 		virtual ~Component() {}
@@ -31,10 +30,9 @@ namespace Rayer {
 		ComponentType GetComponentType() const { return type; }
 
 		
-
 	private:
 
-		ComponentType type;
+		ComponentType type = ComponentType::None;
 
 	 
 	};

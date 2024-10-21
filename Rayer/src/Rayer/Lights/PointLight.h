@@ -21,11 +21,14 @@ namespace Rayer {
 
     public:
 
-        PointLight(const std::string& name);
+        PointLight(const std::string& name , const int entity_id);
 
         PointLightProps& GetLightProperties() { return lightProps; }
 
         void CalculatePosition();
+
+        void SetIntensity(float intensity) { lightProps.intensity = intensity; }
+        void SetColor(const glm::vec3& color) { lightProps.color = color; }
 
     private:
 
