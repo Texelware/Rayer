@@ -1,4 +1,4 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/jaxxcoder/Rayer/blob/master/GPL3-license.txt)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Texelware/Rayer/blob/master/GPL3-license.txt)
 
 ![RAYER](https://github.com/jaxxcoder/Rayer/blob/master/Resources/Logo/Rayer-logo.png "RAYER")
 
@@ -19,7 +19,7 @@ Visual Studio 2022 recommended, Rayer is officially untested on other developmen
 
 <ins>**1. Downloading the repository:**</ins>
 
-Start by cloning the repository with `git clone https://github.com/jaxxcoder/Rayer.git`.
+Start by cloning the repository with `git clone https://github.com/Texelware/Rayer.git`.
 
 
 
